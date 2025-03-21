@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallet Generator Tool</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #1a1a1a 0%, #333 100%);
+            color: #ffd700;
+        }
+        .container {
+            background: #1a1a1a;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+            border: 2px solid #ffd700;
+            animation: fadeIn 1s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        h1 {
+            text-align: center;
+            color: #ffd700;
+            text-shadow: 0 0 10px #ffd700;
+            animation: glow 2s infinite alternate;
+        }
+        @keyframes glow {
+            from { text-shadow: 0 0 5px #ffd700; }
+            to { text-shadow: 0 0 15px #ffd700; }
+        }
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .tab-btn {
+            padding: 12px 25px;
+            border: none;
+            background: #333;
+            color: #ffd700;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 0 5px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        .tab-btn:hover {
+            background: #ffd700;
+            color: #1a1a1a;
+            transform: scale(1.05);
+        }
+        .tab-btn.active {
+            background: #ffd700;
+            color: #1a1a1a;
+            box-shadow: 0 0 15px #ffd700;
+        }
+        .tab-content {
+            display: none;
+            text-align: center;
+        }
+        .tab-content.active {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        input {
+            padding: 12px;
+            margin: 10px;
+            width: 200px;
+            border: 2px solid #ffd700;
+            border-radius: 8px;
+            background: #333;
+            color: #ffd700;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        input:focus {
+            outline: none;
+            box-shadow: 0 0 10px #ffd700;
+            border-color: #ffeb3b;
+        }
+        .note {
+            font-size: 14px;
+            color: #ffeb3b;
+            margin: 10px 0;
+            text-align: left;
+            background: rgba(255, 215, 0, 0.1);
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+        .generate-btn {
+            background: #ffd700;
+            color: #1a1a1a;
+        }
+        .generate-btn:hover {
+            background: #ffeb3b;
+            transform: scale(1.1);
+            box-shadow: 0 0 15px #ffd700;
+        }
+        .stop-btn {
+            background: #b71c1c;
+            color: #fff;
+            display: none;
+        }
+        .stop-btn:hover {
+            background: #d32f2f;
+            transform: scale(1.1);
+            box-shadow: 0 0 15px #b71c1c;
+        }
+        .new-btn {
+            background: #0288d1;
+            color: #fff;
+            display: none;
+        }
+        .new-btn:hover {
+            background: #03a9f4;
+            transform: scale(1.1);
+            box-shadow: 0 0 15px #0288d1;
+        }
+        #result {
+            margin-top: 20px;
+            white-space: pre-wrap;
+            text-align: left;
+            background: #333;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #ffd700;
+            color: #ffd700;
+            position: relative;
+            max-height: 400px;
+            overflow-y: auto;
+            animation: resultFade 0.5s ease;
+        }
+        @keyframes resultFade {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ffd700;
+            color: #1a1a1a;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .copy-btn:hover {
+            background: #ffeb3b;
+            transform: scale(1.1);
+            box-shadow: 0 0 10px #ffd700;
+        }
+        .donate-section {
+            margin-top: 30px;
+            text-align: center;
+            padding: 20px;
+            background: #1a1a1a;
+            border-radius: 10px;
+            border: 1px solid #ffd700;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+        .donate-section h3 {
+            color: #ffd700;
+            margin-bottom: 15px;
+            text-shadow: 0 0 5px #ffd700;
+        }
+        .donate-section img {
+            max-width: 200px;
+            border: 2px solid #ffd700;
+            border-radius: 10px;
+            transition: transform 0.3s ease;
+        }
+        .donate-section img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px #ffd700;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Wallet Generator Tool</h1>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('custom')">Custom Wallet</button>
+            <button class="tab-btn" onclick="showTab('multiple')">Multiple Wallets</button>
+        </div>
+
+        <div id="custom" class="tab-content active">
+            <label for="ending">Điền đuôi ví mong muốn:</label>
+            <input type="text" id="ending" placeholder="e.g., 666666">
+            <br>
+            <div class="note">
+                Note: Càng dài sẽ càng lâu, để 6 số sẽ tối ưu thời gian hơn tùy vào nhân phẩm nữa:)
+            </div>
+            <button class="btn generate-btn" onclick="generateCustomWallet()">Generate Wallet</button>
+            <button class="btn stop-btn" onclick="stopGeneration()">Stop</button>
+            <button class="btn new-btn" onclick="resetForm('custom')">Generate New</button>
+        </div>
+
+        <div id="multiple" class="tab-content">
+            <label for="numWallets">Số ví muốn tạo:</label>
+            <input type="number" id="numWallets" placeholder="e.g., 10" min="1">
+            <br>
+            <div class="note">
+                Note: Tối đa 100 ví.
+            </div>
+            <button class="btn generate-btn" onclick="generateMultipleWallets()">Generate Wallets</button>
+            <button class="btn stop-btn" onclick="stopGeneration()">Stop</button>
+            <button class="btn new-btn" onclick="resetForm('multiple')">Generate New</button>
+        </div>
+
+        <div id="result"></div>
+
+        <!-- Phần Donate -->
+        <div class="donate-section">
+            <h3>Support Us</h3>
+            <p>Nếu bạn giàu hãy doante cho mình để mình nâng cấp máy chủ nhé!</p>
+            <img src="./img/qrdonate.jpg" alt="Donate QR Code">
+        </div>
+    </div>
+
+    <script>
+        let abortController = null;
+
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            document.querySelector(`.tab-btn[onclick="showTab('${tabId}')"]`).classList.add('active');
+            resetForm(tabId);
+        }
+
+        async function generateCustomWallet() {
+            const ending = document.getElementById('ending').value.trim();
+            if (!ending) {
+                alert('Please enter a desired ending');
+                return;
+            }
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Đợi đi sẽ mất nhiều thời gian đó, nhớ đừng thoát web nhé!';
+            
+            toggleButtons('custom', true);
+
+            abortController = new AbortController();
+
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ending: ending }),
+                    signal: abortController.signal
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`);
+                }
+
+                const data = await response.json();
+                console.log('Response data:', data); // Debug response từ server
+
+                if (data.success && data.address) {
+                    resultDiv.innerHTML = 
+                        `Address: ${data.address}\nPrivate Key: ${data.privateKey}\nSeed Phrase: ${data.mnemonic}` +
+                        '<button class="copy-btn" onclick="copyResult()">Copy</button>';
+                    document.querySelector('#custom .new-btn').style.display = 'inline-block';
+                } else {
+                    resultDiv.innerHTML = 'Error: ' + (data.error || 'Failed to generate wallet');
+                }
+            } catch (error) {
+                handleError(error, resultDiv);
+            } finally {
+                toggleButtons('custom', false);
+            }
+        }
+
+        async function generateMultipleWallets() {
+            const numWallets = parseInt(document.getElementById('numWallets').value);
+            if (!numWallets || numWallets < 1) {
+                alert('Please enter a valid number of wallets (minimum 1)');
+                return;
+            }
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Generating wallets... Please wait...';
+            
+            toggleButtons('multiple', true);
+
+            abortController = new AbortController();
+
+            try {
+                const response = await fetch('/generate-multiple', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ numWallets: numWallets }),
+                    signal: abortController.signal
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`);
+                }
+
+                const data = await response.json();
+                console.log('Response data:', data); // Debug response từ server
+
+                if (data.success && Array.isArray(data.wallets)) {
+                    let resultText = '';
+                    data.wallets.forEach((wallet, index) => {
+                        resultText += `Wallet #${index + 1}:\n`;
+                        resultText += `Address: ${wallet.address}\n`;
+                        resultText += `Private Key: ${wallet.privateKey}\n`;
+                        resultText += `Mnemonic: ${wallet.mnemonic}\n`;
+                        resultText += '----------------------------------------\n';
+                    });
+                    resultDiv.innerHTML = resultText +
+                        '<button class="copy-btn" onclick="copyResult()">Copy</button>';
+                    document.querySelector('#multiple .new-btn').style.display = 'inline-block';
+                } else {
+                    resultDiv.innerHTML = 'Error: ' + (data.error || 'No wallets generated');
+                }
+            } catch (error) {
+                handleError(error, resultDiv);
+            } finally {
+                toggleButtons('multiple', false);
+            }
+        }
+
+        function stopGeneration() {
+            if (abortController) {
+                abortController.abort();
+                abortController = null;
+            }
+        }
+
+        function copyResult() {
+            const resultText = document.getElementById('result').textContent.replace('Copy', '').trim();
+            navigator.clipboard.writeText(resultText);
+            alert('Copied to clipboard!');
+        }
+
+        function resetForm(tabId) {
+            if (tabId === 'custom') {
+                document.getElementById('ending').value = '';
+            }
+            if (tabId === 'multiple') document.getElementById('numWallets').value = '';
+            document.getElementById('result').innerHTML = '';
+            document.querySelector(`#${tabId} .new-btn`).style.display = 'none';
+            document.querySelector(`#${tabId} .generate-btn`).style.display = 'inline-block';
+            document.querySelector(`#${tabId} .stop-btn`).style.display = 'none';
+        }
+
+        function toggleButtons(tabId, generating) {
+            const generateBtn = document.querySelector(`#${tabId} .generate-btn`);
+            const stopBtn = document.querySelector(`#${tabId} .stop-btn`);
+            generateBtn.style.display = generating ? 'none' : 'inline-block';
+            stopBtn.style.display = generating ? 'inline-block' : 'none';
+        }
+
+        function handleError(error, resultDiv) {
+            if (error.name === 'AbortError') {
+                resultDiv.innerHTML = 'Generation stopped. You can modify and try again.';
+            } else {
+                resultDiv.innerHTML = 'Error: ' + error.message;
+                console.error('Client error:', error);
+            }
+        }
+    </script>
+</body>
+</html>
