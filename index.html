@@ -268,14 +268,14 @@
 
         // Firebase configuration
         const firebaseConfig = {
-  apiKey: "AIzaSyBa41cMuMt-h07VoGchnun6W5Ucm8CfKco",
-  authDomain: "gjair-5a6ef.firebaseapp.com",
-  projectId: "gjair-5a6ef",
-  storageBucket: "gjair-5a6ef.firebasestorage.app",
-  messagingSenderId: "905612334060",
-  appId: "1:905612334060:web:7ab006091e66456862e6c9",
-  measurementId: "G-XWBE8W2MEV"
-};
+            apiKey: "AIzaSyBa41cMuMt-h07VoGchnun6W5Ucm8CfKco",
+            authDomain: "gjair-5a6ef.firebaseapp.com",
+            projectId: "gjair-5a6ef",
+            storageBucket: "gjair-5a6ef.firebasestorage.app",
+            messagingSenderId: "905612334060",
+            appId: "1:905612334060:web:7ab006091e66456862e6c9",
+            measurementId: "G-XWBE8W2MEV"
+        };
 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
@@ -283,7 +283,6 @@
 
         let abortController = null;
 
-        
         window.submitLink = async function(linkInput) {
             const link = linkInput.trim();
             if (!link) {
@@ -307,7 +306,6 @@
             }
         };
 
-        // Các hàm chính của Wallet Generator & Airdrop Tool
         window.showTab = function(tabId) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -451,18 +449,26 @@
             if (tabId === 'custom') {
                 document.getElementById('ending').value = '';
             }
-            if (tabId === 'multiple') document.getElementById('numWallets').value = '';
+            if (tabId === 'multiple') {
+                document.getElementById('numWallets').value = '';
+            }
             document.getElementById('result').innerHTML = '';
-            document.querySelector(`#${tabId} .new-btn`).style.display = 'none';
-            document.querySelector(`#${tabId} .generate-btn`).style.display = 'inline-block';
-            document.querySelector(`#${tabId} .stop-btn`).style.display = 'none';
+
+            const newBtn = document.querySelector(`#${tabId} .new-btn`);
+            const generateBtn = document.querySelector(`#${tabId} .generate-btn`);
+            const stopBtn = document.querySelector(`#${tabId} .stop-btn`);
+
+            if (newBtn) newBtn.style.display = 'none';
+            if (generateBtn) generateBtn.style.display = 'inline-block';
+            if (stopBtn) stopBtn.style.display = 'none';
         };
 
         window.toggleButtons = function(tabId, generating) {
             const generateBtn = document.querySelector(`#${tabId} .generate-btn`);
             const stopBtn = document.querySelector(`#${tabId} .stop-btn`);
-            generateBtn.style.display = generating ? 'none' : 'inline-block';
-            stopBtn.style.display = generating ? 'inline-block' : 'none';
+
+            if (generateBtn) generateBtn.style.display = generating ? 'none' : 'inline-block';
+            if (stopBtn) stopBtn.style.display = generating ? 'inline-block' : 'none';
         };
 
         window.handleError = function(error, resultDiv) {
