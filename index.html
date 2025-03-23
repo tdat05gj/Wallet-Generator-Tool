@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wallet Generator Tool</title>
+    <title>Wallet Generator & Airdrop Tool</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -116,6 +116,15 @@
             transform: scale(1.1);
             box-shadow: 0 0 15px #ffd700;
         }
+        .submit-link-btn {
+            background: #0288d1;
+            color: #fff;
+        }
+        .submit-link-btn:hover {
+            background: #03a9f4;
+            transform: scale(1.1);
+            box-shadow: 0 0 15px #0288d1;
+        }
         .stop-btn {
             background: #b71c1c;
             color: #fff;
@@ -136,7 +145,7 @@
             transform: scale(1.1);
             box-shadow: 0 0 15px #0288d1;
         }
-        #result {
+        #result, #linkDisplay {
             margin-top: 20px;
             white-space: pre-wrap;
             text-align: left;
@@ -195,14 +204,22 @@
             transform: scale(1.05);
             box-shadow: 0 0 15px #ffd700;
         }
+        a {
+            color: #ffeb3b;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Wallet Generator Tool</h1>
+        <h1>GJTOOL</h1>
         <div class="tabs">
             <button class="tab-btn active" onclick="showTab('custom')">Custom Wallet</button>
             <button class="tab-btn" onclick="showTab('multiple')">Multiple Wallets</button>
+            <button class="tab-btn" onclick="showTab('airdrop')">Link Check Airdrop</button>
         </div>
 
         <div id="custom" class="tab-content active">
@@ -210,11 +227,11 @@
             <input type="text" id="ending" placeholder="e.g., 666666">
             <br>
             <div class="note">
-                Note: Càng dài sẽ càng lâu, để 6 số sẽ tối ưu thời gian hơn tùy vào nhân phẩm nữa:)
+                Note: Càng dài sẽ càng lâu, để 6 số sẽ tối ưu thời gian hơn tùy vào nhân phẩm nữa :)
             </div>
-            <button class="btn generate-btn" onclick="generateCustomWallet()">Generate Wallet</button>
-            <button class="btn stop-btn" onclick="stopGeneration()">Stop</button>
-            <button class="btn new-btn" onclick="resetForm('custom')">Generate New</button>
+            <button class="btn generate-btn" onclick="generateCustomWallet()">Tạo Ví</button>
+            <button class="btn stop-btn" onclick="stopGeneration()">Dừng</button>
+            <button class="btn new-btn" onclick="resetForm('custom')">Tạo mới</button>
         </div>
 
         <div id="multiple" class="tab-content">
@@ -224,9 +241,13 @@
             <div class="note">
                 Note: Tối đa 100 ví.
             </div>
-            <button class="btn generate-btn" onclick="generateMultipleWallets()">Generate Wallets</button>
-            <button class="btn stop-btn" onclick="stopGeneration()">Stop</button>
-            <button class="btn new-btn" onclick="resetForm('multiple')">Generate New</button>
+            <button class="btn generate-btn" onclick="generateMultipleWallets()">Tạo ví</button>
+            <button class="btn stop-btn" onclick="stopGeneration()">Dừng</button>
+            <button class="btn new-btn" onclick="resetForm('multiple')">Tạo mới</button>
+        </div>
+
+        <div id="airdrop" class="tab-content">
+            <div id="linkDisplay">Đang tải link...</div>
         </div>
 
         <div id="result"></div>
@@ -234,26 +255,72 @@
         <!-- Phần Donate -->
         <div class="donate-section">
             <h3>Support Us</h3>
-            <p>Nếu bạn giàu hãy doante cho mình để mình nâng cấp máy chủ nhé!</p>
+            <p>Nếu bạn giàu hãy donate cho mình để mình nâng cấp máy chủ nhé!</p>
             <img src="./img/qrdonate.jpg" alt="Donate QR Code">
         </div>
     </div>
 
-    <script>
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+  apiKey: "AIzaSyBa41cMuMt-h07VoGchnun6W5Ucm8CfKco",
+  authDomain: "gjair-5a6ef.firebaseapp.com",
+  projectId: "gjair-5a6ef",
+  storageBucket: "gjair-5a6ef.firebasestorage.app",
+  messagingSenderId: "905612334060",
+  appId: "1:905612334060:web:7ab006091e66456862e6c9",
+  measurementId: "G-XWBE8W2MEV"
+};
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
         let abortController = null;
 
-        function showTab(tabId) {
+        
+        window.submitLink = async function(linkInput) {
+            const link = linkInput.trim();
+            if (!link) {
+                console.log('Chưa có Link check airdrop');
+                return;
+            }
+
+            const timestamp = new Date().toLocaleString('vi-VN', {
+                year: 'numeric', month: 'long', day: 'numeric',
+                hour: '2-digit', minute: '2-digit', second: '2-digit'
+            });
+
+            try {
+                await setDoc(doc(db, "links", "latest"), {
+                    link: link,
+                    timestamp: timestamp
+                });
+                console.log('Link submitted successfully:', link);
+            } catch (error) {
+                console.error('Error submitting link:', error.message);
+            }
+        };
+
+        // Các hàm chính của Wallet Generator & Airdrop Tool
+        window.showTab = function(tabId) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
             document.querySelector(`.tab-btn[onclick="showTab('${tabId}')"]`).classList.add('active');
             resetForm(tabId);
-        }
+            if (tabId === 'airdrop') loadLink();
+        };
 
-        async function generateCustomWallet() {
+        window.generateCustomWallet = async function() {
             const ending = document.getElementById('ending').value.trim();
             if (!ending) {
-                alert('Please enter a desired ending');
+                alert('Vui lòng điền đuôi ví mong muốn');
                 return;
             }
 
@@ -278,7 +345,7 @@
                 }
 
                 const data = await response.json();
-                console.log('Response data:', data); // Debug response từ server
+                console.log('Response data:', data);
 
                 if (data.success && data.address) {
                     resultDiv.innerHTML = 
@@ -286,24 +353,24 @@
                         '<button class="copy-btn" onclick="copyResult()">Copy</button>';
                     document.querySelector('#custom .new-btn').style.display = 'inline-block';
                 } else {
-                    resultDiv.innerHTML = 'Error: ' + (data.error || 'Failed to generate wallet');
+                    resultDiv.innerHTML = 'Error: ' + (data.error || 'Tạo ví thất bại');
                 }
             } catch (error) {
                 handleError(error, resultDiv);
             } finally {
                 toggleButtons('custom', false);
             }
-        }
+        };
 
-        async function generateMultipleWallets() {
+        window.generateMultipleWallets = async function() {
             const numWallets = parseInt(document.getElementById('numWallets').value);
             if (!numWallets || numWallets < 1) {
-                alert('Please enter a valid number of wallets (minimum 1)');
+                alert('Vui lòng điền số ví muốn tạo (nhỏ nhất là 1)');
                 return;
             }
 
             const resultDiv = document.getElementById('result');
-            resultDiv.innerHTML = 'Generating wallets... Please wait...';
+            resultDiv.innerHTML = 'Đang tạo ví... Vui lòng chờ...';
             
             toggleButtons('multiple', true);
 
@@ -323,7 +390,7 @@
                 }
 
                 const data = await response.json();
-                console.log('Response data:', data); // Debug response từ server
+                console.log('Response data:', data);
 
                 if (data.success && Array.isArray(data.wallets)) {
                     let resultText = '';
@@ -345,22 +412,42 @@
             } finally {
                 toggleButtons('multiple', false);
             }
-        }
+        };
 
-        function stopGeneration() {
+        window.loadLink = async function() {
+            const linkDisplay = document.getElementById('linkDisplay');
+            try {
+                const docRef = doc(db, "links", "latest");
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    linkDisplay.innerHTML = `
+                        <p>Link Check Airdrop: <a href="${data.link}" target="_blank">${data.link}</a></p>
+                        <p>Thời gian gửi: ${data.timestamp}</p>
+                    `;
+                } else {
+                    linkDisplay.innerHTML = 'Chưa có link nào được gửi.';
+                }
+            } catch (error) {
+                linkDisplay.innerHTML = 'Lỗi tải link: ' + error.message;
+            }
+        };
+
+        window.stopGeneration = function() {
             if (abortController) {
                 abortController.abort();
                 abortController = null;
             }
-        }
+        };
 
-        function copyResult() {
+        window.copyResult = function() {
             const resultText = document.getElementById('result').textContent.replace('Copy', '').trim();
             navigator.clipboard.writeText(resultText);
-            alert('Copied to clipboard!');
-        }
+            alert('Đã sao chép vào bộ nhớ tạm!');
+        };
 
-        function resetForm(tabId) {
+        window.resetForm = function(tabId) {
             if (tabId === 'custom') {
                 document.getElementById('ending').value = '';
             }
@@ -369,23 +456,23 @@
             document.querySelector(`#${tabId} .new-btn`).style.display = 'none';
             document.querySelector(`#${tabId} .generate-btn`).style.display = 'inline-block';
             document.querySelector(`#${tabId} .stop-btn`).style.display = 'none';
-        }
+        };
 
-        function toggleButtons(tabId, generating) {
+        window.toggleButtons = function(tabId, generating) {
             const generateBtn = document.querySelector(`#${tabId} .generate-btn`);
             const stopBtn = document.querySelector(`#${tabId} .stop-btn`);
             generateBtn.style.display = generating ? 'none' : 'inline-block';
             stopBtn.style.display = generating ? 'inline-block' : 'none';
-        }
+        };
 
-        function handleError(error, resultDiv) {
+        window.handleError = function(error, resultDiv) {
             if (error.name === 'AbortError') {
-                resultDiv.innerHTML = 'Generation stopped. You can modify and try again.';
+                resultDiv.innerHTML = 'Đã dừng';
             } else {
                 resultDiv.innerHTML = 'Error: ' + error.message;
                 console.error('Client error:', error);
             }
-        }
+        };
     </script>
 </body>
 </html>
