@@ -67,16 +67,12 @@
         // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-        // Your Firebase configuration
-        const firebaseConfig = {
-  apiKey: "AIzaSyBa41cMuMt-h07VoGchnun6W5Ucm8CfKco",
-  authDomain: "gjair-5a6ef.firebaseapp.com",
-  projectId: "gjair-5a6ef",
-  storageBucket: "gjair-5a6ef.firebasestorage.app",
-  messagingSenderId: "905612334060",
-  appId: "1:905612334060:web:7ab006091e66456862e6c9",
-  measurementId: "G-XWBE8W2MEV"
-};
+
+        // Firebase configuration mã hóa Base64
+        const encodedFirebaseConfig = "eyJhcGlLZXkiOiJBSXphU3lCYTQxY01nTXQtaDA3Vm9HY2hudW42VzVVY204Q2ZLY28iLCJhdXRoRG9tYWluIjoiZ2phaXItNWE2ZWYuZmlyZWJhc2VhcHAuY29tIiwicHJvamVjdElkIjoiZ2phaXItNWE2ZWYiLCJzdG9yYWdlQnVja2V0IjoiZ2phaXItNWE2ZWYuZmlyZWJhc2VzdG9yYWdlLmFwcCIsIm1lc3NhZ2luZ1NlbmRlcklkIjoiOTA1NjEyMzM0MDYwIiwiYXBwSWQiOiIxOjkwNTYxMjMzNDA2MDp3ZWI6N2FiMDA2MDkxZTY2NDU2ODYyZTZjOSIsIm1lYXN1cmVtZW50SWQiOiJHLVhXQkU4VzJNRVYifQ==";
+
+        // Giải mã Base64 thành object
+        const firebaseConfig = JSON.parse(atob(encodedFirebaseConfig));
 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);

@@ -148,7 +148,7 @@
         #result, #linkDisplay {
             margin-top: 20px;
             white-space: pre-wrap;
-            text-align: left;
+            text-align: center;
             background: #333;
             padding: 15px;
             border-radius: 8px;
@@ -212,20 +212,37 @@
             text-decoration: underline;
         }
         .link-item {
-            margin: 10px 0;
-            padding: 15px;
-            background: #2a2a2a;
+            margin: 8px auto;
+            padding: 8px 12px;
+            background: linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 100%);
             border-radius: 8px;
-            border: 1px solid #ffd700;
+            border: 2px solid #ffd700;
             transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         .link-item:hover {
-            transform: scale(1.02);
-            box-shadow: 0 0 10px #ffd700;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(255, 215, 0, 0.5);
+            border-color: #ffeb3b;
+        }
+        .link-item .link-name {
+            font-size: 16px;
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 2px;
+            text-shadow: 0 0 5px #ffd700;
+            text-align: center;
         }
         .link-item p {
-            margin: 5px 0;
+            margin: 1px 0;
             font-size: 14px;
+            line-height: 1.1;
+            text-align: center;
         }
         .link-item a {
             color: #ffeb3b;
@@ -267,9 +284,10 @@
         </div>
 
         <div id="airdrop" class="tab-content">
+            <input type="text" id="linkName" placeholder="Tên link (e.g., Airdrop XYZ)">
             <input type="text" id="linkInput" placeholder="Nhập link airdrop">
             <button class="btn submit-link-btn" id="submitLinkBtn">Gửi Link</button>
-            <div id="linkDisplay">Đang tải danh sách link...</div>
+            <div id="linkDisplay">Chưa có link nào được gửi...</div>
         </div>
 
         <div id="result"></div>
@@ -277,27 +295,23 @@
         <!-- Phần Donate -->
         <div class="donate-section">
             <h3>Support Us</h3>
-            <p>Nếu bạn giàu hãy donate cho mình để mình nâng cấp máy chủ nhé!</p>
+            <p>Donate cho mình để mình nâng cấp máy chủ nhé!</p>
             <img src="./img/qrdonate.jpg" alt="Donate QR Code">
         </div>
     </div>
 
-    <!-- Firebase SDK -->
+    <!-- Thư viện và script -->
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.0/dist/ethers.umd.min.js"></script>
     <script type="module">
-        // Import Firebase modules
+        // Firebase SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyBa41cMuMt-h07VoGchnun6W5Ucm8CfKco",
-            authDomain: "gjair-5a6ef.firebaseapp.com",
-            projectId: "gjair-5a6ef",
-            storageBucket: "gjair-5a6ef.firebasestorage.app",
-            messagingSenderId: "905612334060",
-            appId: "1:905612334060:web:7ab006091e66456862e6c9",
-            measurementId: "G-XWBE8W2MEV"
-        };
+        // Firebase configuration mã hóa Base64
+        const encodedFirebaseConfig = "eyJhcGlLZXkiOiJBSXphU3lCYTQxY01nTXQtaDA3Vm9HY2hudW42VzVVY204Q2ZLY28iLCJhdXRoRG9tYWluIjoiZ2phaXItNWE2ZWYuZmlyZWJhc2VhcHAuY29tIiwicHJvamVjdElkIjoiZ2phaXItNWE2ZWYiLCJzdG9yYWdlQnVja2V0IjoiZ2phaXItNWE2ZWYuZmlyZWJhc2VzdG9yYWdlLmFwcCIsIm1lc3NhZ2luZ1NlbmRlcklkIjoiOTA1NjEyMzM0MDYwIiwiYXBwSWQiOiIxOjkwNTYxMjMzNDA2MDp3ZWI6N2FiMDA2MDkxZTY2NDU2ODYyZTZjOSIsIm1lYXN1cmVtZW50SWQiOiJHLVhXQkU4VzJNRVYifQ==";
+
+        // Giải mã Base64 thành object
+        const firebaseConfig = JSON.parse(atob(encodedFirebaseConfig));
 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
@@ -305,7 +319,6 @@
 
         let abortController = null;
 
-        // Hàm băm đơn giản để ẩn mật khẩu
         function simpleHash(str) {
             let hash = 0;
             for (let i = 0; i < str.length; i++) {
@@ -315,51 +328,73 @@
             return hash;
         }
 
-       
-        const SECRET_HASH = 99526; 
+        const SECRET_HASH = 99526;
 
-        async function submitLink(linkInput) {
-            const link = linkInput ? linkInput.trim() : '';
-            if (!link || link === 'undefined') {
+        // Hàm gửi link
+        async function submitLink() {
+            const linkName = document.getElementById('linkName').value.trim();
+            const link = document.getElementById('linkInput').value.trim();
+
+            if (!link) {
                 alert('Vui lòng nhập link hợp lệ!');
+                return;
+            }
+            if (!linkName) {
+                alert('Vui lòng nhập tên link!');
                 return;
             }
 
             const password = prompt("Nhập mã để gửi link:");
             if (simpleHash(password) !== SECRET_HASH) {
-                alert("Bạn không có quyền gửi link.");
+                alert("Mã sai, bạn không có quyền gửi link!");
                 return;
             }
 
-            const timestamp = new Date().toLocaleString('vi-VN', {
-                year: 'numeric', month: 'long', day: 'numeric',
-                hour: '2-digit', minute: '2-digit', second: '2-digit'
-            });
-
+            const timestamp = new Date().toLocaleString('vi-VN', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
             try {
                 await addDoc(collection(db, "links"), {
+                    name: linkName,
                     link: link,
                     timestamp: timestamp,
                     createdAt: new Date().toISOString()
                 });
-                console.log('Link submitted successfully:', link);
-                document.getElementById('linkInput').value = ''; // Xóa input
-                loadLinks(); // Cập nhật danh sách
+                document.getElementById('linkName').value = '';
+                document.getElementById('linkInput').value = '';
+                loadLinks();
             } catch (error) {
-                console.error('Error submitting link:', error.message);
                 alert('Lỗi khi gửi link: ' + error.message);
             }
         }
 
-        function showTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            document.querySelector(`.tab-btn[data-tab="${tabId}"]`).classList.add('active');
-            resetForm(tabId);
-            if (tabId === 'airdrop') loadLinks();
+        // Hàm tải danh sách link
+        async function loadLinks() {
+            const linkDisplay = document.getElementById('linkDisplay');
+            try {
+                const q = query(collection(db, "links"), orderBy("createdAt", "desc"));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    linkDisplay.innerHTML = 'Chưa có link nào được gửi...';
+                } else {
+                    let linkList = '';
+                    querySnapshot.forEach((doc) => {
+                        const data = doc.data();
+                        linkList += `
+                            <div class="link-item">
+                                <div class="link-name">${data.name}</div>
+                                <p>Link: <a href="${data.link}" target="_blank">${data.link}</a></p>
+                                <p>Thời gian: ${data.timestamp}</p>
+                            </div>
+                        `;
+                    });
+                    linkDisplay.innerHTML = linkList;
+                }
+            } catch (error) {
+                linkDisplay.innerHTML = 'Lỗi tải danh sách link: ' + error.message;
+            }
         }
 
+        // Hàm tạo ví tùy chỉnh
         async function generateCustomWallet() {
             const ending = document.getElementById('ending').value.trim();
             if (!ending) {
@@ -369,7 +404,6 @@
 
             const resultDiv = document.getElementById('result');
             resultDiv.innerHTML = 'Đợi đi sẽ mất nhiều thời gian đó, nhớ đừng thoát web nhé!';
-            
             toggleButtons('custom', true);
 
             abortController = new AbortController();
@@ -382,13 +416,8 @@
                     signal: abortController.signal
                 });
 
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`);
-                }
-
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
                 const data = await response.json();
-                console.log('Response data:', data);
 
                 if (data.success && data.address) {
                     resultDiv.innerHTML = 
@@ -405,6 +434,7 @@
             }
         }
 
+        // Hàm tạo nhiều ví
         async function generateMultipleWallets() {
             const numWallets = parseInt(document.getElementById('numWallets').value);
             if (!numWallets || numWallets < 1) {
@@ -414,7 +444,6 @@
 
             const resultDiv = document.getElementById('result');
             resultDiv.innerHTML = 'Đang tạo ví... Vui lòng chờ...';
-            
             toggleButtons('multiple', true);
 
             abortController = new AbortController();
@@ -427,22 +456,13 @@
                     signal: abortController.signal
                 });
 
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`);
-                }
-
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
                 const data = await response.json();
-                console.log('Response data:', data);
 
                 if (data.success && Array.isArray(data.wallets)) {
                     let resultText = '';
                     data.wallets.forEach((wallet, index) => {
-                        resultText += `Wallet #${index + 1}:\n`;
-                        resultText += `Address: ${wallet.address}\n`;
-                        resultText += `Private Key: ${wallet.privateKey}\n`;
-                        resultText += `Mnemonic: ${wallet.mnemonic}\n`;
-                        resultText += '----------------------------------------\n';
+                        resultText += `Wallet #${index + 1}:\nAddress: ${wallet.address}\nPrivate Key: ${wallet.privateKey}\nMnemonic: ${wallet.mnemonic}\n----------------------------------------\n`;
                     });
                     resultDiv.innerHTML = resultText +
                         '<button class="copy-btn" onclick="copyResult()">Copy</button>';
@@ -457,31 +477,7 @@
             }
         }
 
-        async function loadLinks() {
-            const linkDisplay = document.getElementById('linkDisplay');
-            try {
-                const q = query(collection(db, "links"), orderBy("createdAt", "desc"));
-                const querySnapshot = await getDocs(q);
-                if (querySnapshot.empty) {
-                    linkDisplay.innerHTML = 'Chưa có link nào được gửi.';
-                } else {
-                    let linkList = '';
-                    querySnapshot.forEach((doc) => {
-                        const data = doc.data();
-                        linkList += `
-                            <div class="link-item">
-                                <p>Link: <a href="${data.link}" target="_blank">${data.link}</a></p>
-                                <p>Thời gian: ${data.timestamp}</p>
-                            </div>
-                        `;
-                    });
-                    linkDisplay.innerHTML = linkList;
-                }
-            } catch (error) {
-                linkDisplay.innerHTML = 'Lỗi tải danh sách link: ' + error.message;
-            }
-        }
-
+        // Các hàm hỗ trợ
         function stopGeneration() {
             if (abortController) {
                 abortController.abort();
@@ -489,18 +485,18 @@
             }
         }
 
-        window.copyResult = function() { // Giữ window cho copyResult vì dùng trong inline HTML
+        window.copyResult = function() {
             const resultText = document.getElementById('result').textContent.replace('Copy', '').trim();
             navigator.clipboard.writeText(resultText);
             alert('Đã sao chép vào bộ nhớ tạm!');
         }
 
         function resetForm(tabId) {
-            if (tabId === 'custom') {
-                document.getElementById('ending').value = '';
-            }
-            if (tabId === 'multiple') {
-                document.getElementById('numWallets').value = '';
+            if (tabId === 'custom') document.getElementById('ending').value = '';
+            if (tabId === 'multiple') document.getElementById('numWallets').value = '';
+            if (tabId === 'airdrop') {
+                document.getElementById('linkName').value = '';
+                document.getElementById('linkInput').value = '';
             }
             document.getElementById('result').innerHTML = '';
 
@@ -516,7 +512,6 @@
         function toggleButtons(tabId, generating) {
             const generateBtn = document.querySelector(`#${tabId} .generate-btn`);
             const stopBtn = document.querySelector(`#${tabId} .stop-btn`);
-
             if (generateBtn) generateBtn.style.display = generating ? 'none' : 'inline-block';
             if (stopBtn) stopBtn.style.display = generating ? 'inline-block' : 'none';
         }
@@ -526,29 +521,33 @@
                 resultDiv.innerHTML = 'Đã dừng';
             } else {
                 resultDiv.innerHTML = 'Error: ' + error.message;
-                console.error('Client error:', error);
             }
         }
 
-        // Thêm event listener sau khi DOM tải xong
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            document.querySelector(`.tab-btn[data-tab="${tabId}"]`).classList.add('active');
+            resetForm(tabId);
+            if (tabId === 'airdrop') loadLinks();
+        }
+
+        // Thêm event listener
         document.addEventListener('DOMContentLoaded', () => {
-            // Tab buttons
             document.querySelectorAll('.tab-btn').forEach(button => {
                 button.addEventListener('click', () => showTab(button.getAttribute('data-tab')));
             });
 
-            // Custom Wallet buttons
             document.getElementById('generateCustomBtn').addEventListener('click', generateCustomWallet);
             document.getElementById('stopCustomBtn').addEventListener('click', stopGeneration);
             document.getElementById('newCustomBtn').addEventListener('click', () => resetForm('custom'));
 
-            // Multiple Wallets buttons
             document.getElementById('generateMultipleBtn').addEventListener('click', generateMultipleWallets);
             document.getElementById('stopMultipleBtn').addEventListener('click', stopGeneration);
             document.getElementById('newMultipleBtn').addEventListener('click', () => resetForm('multiple'));
 
-            // Submit Link button
-            document.getElementById('submitLinkBtn').addEventListener('click', () => submitLink(document.getElementById('linkInput').value));
+            document.getElementById('submitLinkBtn').addEventListener('click', submitLink);
         });
     </script>
 </body>
