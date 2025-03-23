@@ -211,15 +211,35 @@
         a:hover {
             text-decoration: underline;
         }
+        .link-item {
+            margin: 10px 0;
+            padding: 15px;
+            background: #2a2a2a;
+            border-radius: 8px;
+            border: 1px solid #ffd700;
+            transition: all 0.3s ease;
+        }
+        .link-item:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 10px #ffd700;
+        }
+        .link-item p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        .link-item a {
+            color: #ffeb3b;
+            word-break: break-all;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>GJTOOL</h1>
         <div class="tabs">
-            <button class="tab-btn active" onclick="showTab('custom')">Custom Wallet</button>
-            <button class="tab-btn" onclick="showTab('multiple')">Multiple Wallets</button>
-            <button class="tab-btn" onclick="showTab('airdrop')">Link Check Airdrop</button>
+            <button class="tab-btn active" data-tab="custom">Custom Wallet</button>
+            <button class="tab-btn" data-tab="multiple">Multiple Wallets</button>
+            <button class="tab-btn" data-tab="airdrop">Link Check Airdrop</button>
         </div>
 
         <div id="custom" class="tab-content active">
@@ -229,9 +249,9 @@
             <div class="note">
                 Note: Càng dài sẽ càng lâu, để 6 số sẽ tối ưu thời gian hơn tùy vào nhân phẩm nữa :)
             </div>
-            <button class="btn generate-btn" onclick="generateCustomWallet()">Tạo Ví</button>
-            <button class="btn stop-btn" onclick="stopGeneration()">Dừng</button>
-            <button class="btn new-btn" onclick="resetForm('custom')">Tạo mới</button>
+            <button class="btn generate-btn" id="generateCustomBtn">Tạo Ví</button>
+            <button class="btn stop-btn" id="stopCustomBtn">Dừng</button>
+            <button class="btn new-btn" id="newCustomBtn">Tạo mới</button>
         </div>
 
         <div id="multiple" class="tab-content">
@@ -241,13 +261,15 @@
             <div class="note">
                 Note: Tối đa 100 ví.
             </div>
-            <button class="btn generate-btn" onclick="generateMultipleWallets()">Tạo ví</button>
-            <button class="btn stop-btn" onclick="stopGeneration()">Dừng</button>
-            <button class="btn new-btn" onclick="resetForm('multiple')">Tạo mới</button>
+            <button class="btn generate-btn" id="generateMultipleBtn">Tạo ví</button>
+            <button class="btn stop-btn" id="stopMultipleBtn">Dừng</button>
+            <button class="btn new-btn" id="newMultipleBtn">Tạo mới</button>
         </div>
 
         <div id="airdrop" class="tab-content">
-            <div id="linkDisplay">Đang tải link...</div>
+            <input type="text" id="linkInput" placeholder="Nhập link airdrop">
+            <button class="btn submit-link-btn" id="submitLinkBtn">Gửi Link</button>
+            <div id="linkDisplay">Đang tải danh sách link...</div>
         </div>
 
         <div id="result"></div>
@@ -264,7 +286,7 @@
     <script type="module">
         // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
         // Firebase configuration
         const firebaseConfig = {
@@ -283,10 +305,29 @@
 
         let abortController = null;
 
-        window.submitLink = async function(linkInput) {
-            const link = linkInput.trim();
-            if (!link) {
-                console.log('Chưa có Link check airdrop');
+        // Hàm băm đơn giản để ẩn mật khẩu
+        function simpleHash(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                hash = ((hash << 5) - hash) + str.charCodeAt(i);
+                hash = hash & hash; // Convert to 32bit integer
+            }
+            return hash;
+        }
+
+       
+        const SECRET_HASH = 99526; 
+
+        async function submitLink(linkInput) {
+            const link = linkInput ? linkInput.trim() : '';
+            if (!link || link === 'undefined') {
+                alert('Vui lòng nhập link hợp lệ!');
+                return;
+            }
+
+            const password = prompt("Nhập mã để gửi link:");
+            if (simpleHash(password) !== SECRET_HASH) {
+                alert("Bạn không có quyền gửi link.");
                 return;
             }
 
@@ -296,26 +337,30 @@
             });
 
             try {
-                await setDoc(doc(db, "links", "latest"), {
+                await addDoc(collection(db, "links"), {
                     link: link,
-                    timestamp: timestamp
+                    timestamp: timestamp,
+                    createdAt: new Date().toISOString()
                 });
                 console.log('Link submitted successfully:', link);
+                document.getElementById('linkInput').value = ''; // Xóa input
+                loadLinks(); // Cập nhật danh sách
             } catch (error) {
                 console.error('Error submitting link:', error.message);
+                alert('Lỗi khi gửi link: ' + error.message);
             }
-        };
+        }
 
-        window.showTab = function(tabId) {
+        function showTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
-            document.querySelector(`.tab-btn[onclick="showTab('${tabId}')"]`).classList.add('active');
+            document.querySelector(`.tab-btn[data-tab="${tabId}"]`).classList.add('active');
             resetForm(tabId);
-            if (tabId === 'airdrop') loadLink();
-        };
+            if (tabId === 'airdrop') loadLinks();
+        }
 
-        window.generateCustomWallet = async function() {
+        async function generateCustomWallet() {
             const ending = document.getElementById('ending').value.trim();
             if (!ending) {
                 alert('Vui lòng điền đuôi ví mong muốn');
@@ -358,9 +403,9 @@
             } finally {
                 toggleButtons('custom', false);
             }
-        };
+        }
 
-        window.generateMultipleWallets = async function() {
+        async function generateMultipleWallets() {
             const numWallets = parseInt(document.getElementById('numWallets').value);
             if (!numWallets || numWallets < 1) {
                 alert('Vui lòng điền số ví muốn tạo (nhỏ nhất là 1)');
@@ -410,42 +455,47 @@
             } finally {
                 toggleButtons('multiple', false);
             }
-        };
+        }
 
-        window.loadLink = async function() {
+        async function loadLinks() {
             const linkDisplay = document.getElementById('linkDisplay');
             try {
-                const docRef = doc(db, "links", "latest");
-                const docSnap = await getDoc(docRef);
-
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    linkDisplay.innerHTML = `
-                        <p>Link Check Airdrop: <a href="${data.link}" target="_blank">${data.link}</a></p>
-                        <p>Thời gian gửi: ${data.timestamp}</p>
-                    `;
-                } else {
+                const q = query(collection(db, "links"), orderBy("createdAt", "desc"));
+                const querySnapshot = await getDocs(q);
+                if (querySnapshot.empty) {
                     linkDisplay.innerHTML = 'Chưa có link nào được gửi.';
+                } else {
+                    let linkList = '';
+                    querySnapshot.forEach((doc) => {
+                        const data = doc.data();
+                        linkList += `
+                            <div class="link-item">
+                                <p>Link: <a href="${data.link}" target="_blank">${data.link}</a></p>
+                                <p>Thời gian: ${data.timestamp}</p>
+                            </div>
+                        `;
+                    });
+                    linkDisplay.innerHTML = linkList;
                 }
             } catch (error) {
-                linkDisplay.innerHTML = 'Lỗi tải link: ' + error.message;
+                linkDisplay.innerHTML = 'Lỗi tải danh sách link: ' + error.message;
             }
-        };
+        }
 
-        window.stopGeneration = function() {
+        function stopGeneration() {
             if (abortController) {
                 abortController.abort();
                 abortController = null;
             }
-        };
+        }
 
-        window.copyResult = function() {
+        window.copyResult = function() { // Giữ window cho copyResult vì dùng trong inline HTML
             const resultText = document.getElementById('result').textContent.replace('Copy', '').trim();
             navigator.clipboard.writeText(resultText);
             alert('Đã sao chép vào bộ nhớ tạm!');
-        };
+        }
 
-        window.resetForm = function(tabId) {
+        function resetForm(tabId) {
             if (tabId === 'custom') {
                 document.getElementById('ending').value = '';
             }
@@ -461,24 +511,45 @@
             if (newBtn) newBtn.style.display = 'none';
             if (generateBtn) generateBtn.style.display = 'inline-block';
             if (stopBtn) stopBtn.style.display = 'none';
-        };
+        }
 
-        window.toggleButtons = function(tabId, generating) {
+        function toggleButtons(tabId, generating) {
             const generateBtn = document.querySelector(`#${tabId} .generate-btn`);
             const stopBtn = document.querySelector(`#${tabId} .stop-btn`);
 
             if (generateBtn) generateBtn.style.display = generating ? 'none' : 'inline-block';
             if (stopBtn) stopBtn.style.display = generating ? 'inline-block' : 'none';
-        };
+        }
 
-        window.handleError = function(error, resultDiv) {
+        function handleError(error, resultDiv) {
             if (error.name === 'AbortError') {
                 resultDiv.innerHTML = 'Đã dừng';
             } else {
                 resultDiv.innerHTML = 'Error: ' + error.message;
                 console.error('Client error:', error);
             }
-        };
+        }
+
+        // Thêm event listener sau khi DOM tải xong
+        document.addEventListener('DOMContentLoaded', () => {
+            // Tab buttons
+            document.querySelectorAll('.tab-btn').forEach(button => {
+                button.addEventListener('click', () => showTab(button.getAttribute('data-tab')));
+            });
+
+            // Custom Wallet buttons
+            document.getElementById('generateCustomBtn').addEventListener('click', generateCustomWallet);
+            document.getElementById('stopCustomBtn').addEventListener('click', stopGeneration);
+            document.getElementById('newCustomBtn').addEventListener('click', () => resetForm('custom'));
+
+            // Multiple Wallets buttons
+            document.getElementById('generateMultipleBtn').addEventListener('click', generateMultipleWallets);
+            document.getElementById('stopMultipleBtn').addEventListener('click', stopGeneration);
+            document.getElementById('newMultipleBtn').addEventListener('click', () => resetForm('multiple'));
+
+            // Submit Link button
+            document.getElementById('submitLinkBtn').addEventListener('click', () => submitLink(document.getElementById('linkInput').value));
+        });
     </script>
 </body>
 </html>
