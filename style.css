@@ -1,0 +1,359 @@
+body {
+    font-family: 'Arial', sans-serif;
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background: linear-gradient(135deg, #1a1a1a 0%, #333 100%);
+    color: #ffd700;
+}
+
+.container {
+    background: #1a1a1a;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+    border: 2px solid #ffd700;
+    animation: fadeIn 1s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+h1 {
+    text-align: center;
+    color: #ffd700;
+    text-shadow: 0 0 10px #ffd700;
+    animation: glow 2s infinite alternate;
+}
+
+@keyframes glow {
+    from { text-shadow: 0 0 5px #ffd700; }
+    to { text-shadow: 0 0 15px #ffd700; }
+}
+
+.tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.tab-btn {
+    padding: 12px 25px;
+    border: none;
+    background: #333;
+    color: #ffd700;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 0 5px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.tab-btn:hover {
+    background: #ffd700;
+    color: #1a1a1a;
+    transform: scale(1.05);
+}
+
+.tab-btn.active {
+    background: #ffd700;
+    color: #1a1a1a;
+    box-shadow: 0 0 15px #ffd700;
+}
+
+.tab-content {
+    display: none;
+    text-align: center;
+}
+
+.tab-content.active {
+    display: block;
+    animation: slideIn 0.5s ease;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+input {
+    padding: 12px;
+    margin: 10px;
+    width: 200px;
+    border: 2px solid #ffd700;
+    border-radius: 8px;
+    background: #333;
+    color: #ffd700;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+input:focus {
+    outline: none;
+    box-shadow: 0 0 10px #ffd700;
+    border-color: #ffeb3b;
+}
+
+.note {
+    font-size: 14px;
+    color: #ffeb3b;
+    margin: 10px 0;
+    text-align: left;
+    background: rgba(255, 215, 0, 0.1);
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.btn {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 5px;
+    transition: all 0.3s ease;
+}
+
+.generate-btn {
+    background: #ffd700;
+    color: #1a1a1a;
+}
+
+.generate-btn:hover {
+    background: #ffeb3b;
+    transform: scale(1.1);
+    box-shadow: 0 0 15px #ffd700;
+}
+
+.submit-link-btn {
+    background: #0288d1;
+    color: #fff;
+}
+
+.submit-link-btn:hover {
+    background: #03a9f4;
+    transform: scale(1.1);
+    box-shadow: 0 0 15px #0288d1;
+}
+
+.stop-btn {
+    background: #b71c1c;
+    color: #fff;
+    display: none;
+}
+
+.stop-btn:hover {
+    background: #d32f2f;
+    transform: scale(1.1);
+    box-shadow: 0 0 15px #b71c1c;
+}
+
+.new-btn {
+    background: #0288d1;
+    color: #fff;
+    display: none;
+}
+
+.new-btn:hover {
+    background: #03a9f4;
+    transform: scale(1.1);
+    box-shadow: 0 0 15px #0288d1;
+}
+
+#result, #linkDisplay {
+    margin-top: 20px;
+    white-space: pre-wrap;
+    text-align: center;
+    background: #333;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #ffd700;
+    color: #ffd700;
+    position: relative;
+    max-height: 400px;
+    overflow-y: auto;
+    animation: resultFade 0.5s ease;
+}
+
+@keyframes resultFade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.copy-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #ffd700;
+    color: #1a1a1a;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.copy-btn:hover {
+    background: #ffeb3b;
+    transform: scale(1.1);
+    box-shadow: 0 0 10px #ffd700;
+}
+
+.donate-section {
+    margin-top: 30px;
+    text-align: center;
+    padding: 20px;
+    background: #1a1a1a;
+    border-radius: 10px;
+    border: 1px solid #ffd700;
+    animation: fadeIn 1.5s ease-in-out;
+}
+
+.donate-section h3 {
+    color: #ffd700;
+    margin-bottom: 15px;
+    text-shadow: 0 0 5px #ffd700;
+}
+
+.donate-section img {
+    max-width: 200px;
+    border: 2px solid #ffd700;
+    border-radius: 10px;
+    transition: transform 0.3s ease;
+}
+
+.donate-section img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px #ffd700;
+}
+
+a {
+    color: #ffeb3b;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.link-item {
+    margin: 8px auto;
+    padding: 8px 12px;
+    background: linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 100%);
+    border-radius: 8px;
+    border: 2px solid #ffd700;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.link-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(255, 215, 0, 0.5);
+    border-color: #ffeb3b;
+}
+
+.link-item .link-name {
+    font-size: 16px;
+    font-weight: bold;
+    color: #ffd700;
+    margin-bottom: 2px;
+    text-shadow: 0 0 5px #ffd700;
+    text-align: center;
+}
+
+.link-item p {
+    margin: 1px 0;
+    font-size: 14px;
+    line-height: 1.1;
+    text-align: center;
+}
+
+.link-item a {
+    color: #ffeb3b;
+    word-break: break-all;
+}
+
+/* Social Links Styles */
+.social-links {
+    margin-top: 20px;
+}
+
+.social-links h4 {
+    color: #ffd700;
+    margin: 10px 0;
+    text-shadow: 0 0 5px #ffd700;
+}
+
+.social-links div {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.social-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 15px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #fff;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    border: 2px solid #ffd700;
+}
+
+.social-btn img {
+    width: 40px; /* Tăng kích thước để rõ nét hơn */
+    height: 40px;
+    vertical-align: middle;
+    margin-right: 8px;
+    image-rendering: -webkit-optimize-contrast; /* Cải thiện độ sắc nét trên Webkit */
+    image-rendering: crisp-edges; /* Cải thiện độ sắc nét chung */
+}
+
+.social-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px #ffd700;
+    color: #fff;
+    text-decoration: none;
+}
+
+.github {
+    background: #24292e;
+}
+
+.github:hover {
+    background: #333;
+}
+
+.discord {
+    background: #5865F2;
+}
+
+.discord:hover {
+    background: #7289da;
+}
+
+.x {
+    background: #000000;
+}
+
+.x:hover {
+    background: #333;
+}
+
+.telegram {
+    background: #0088cc;
+}
+
+.telegram:hover {
+    background: #00aced;
+}
