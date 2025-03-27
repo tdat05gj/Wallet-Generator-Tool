@@ -1,34 +1,16 @@
-/* Reset và font */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-/* Body với gradient đẹp hơn */
 body {
-    font-family: 'Orbitron', sans-serif;
-    max-width: 1200px;
-    margin: 60px auto;
-    padding: 40px;
-    background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 40%, #3a3a3a 60%, #2c2c2c 80%, #1a1a1a 100%), 
-                radial-gradient(circle at 50% 50%, rgba(255, 215, 0, 0.2), rgba(255, 100, 0, 0.1), transparent 80%);
-    background-size: 400% 400%, 120% 120%;
-    animation: rainbowFlow 30s ease-in-out infinite;
-    color: #ffeb3b;
-    min-height: 100vh;
+    font-family: 'Poppins', sans-serif;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    background: #0a0a0a;
+    color: #ffd700;
+    line-height: 1.6;
     position: relative;
     overflow-x: hidden;
 }
 
-/* Gradient cầu vồng đẹp hơn */
-@keyframes rainbowFlow {
-    0% { background-position: 0% 50%, 50% 50%; filter: hue-rotate(0deg); }
-    50% { background-position: 100% 50%, 50% 50%; filter: hue-rotate(180deg); }
-    100% { background-position: 0% 50%, 50% 50%; filter: hue-rotate(360deg); }
-}
-
-/* Lớp sao 1 - Nhỏ, dày, đa dạng màu */
+/* Nền sao tĩnh lấp lánh */
 body::before {
     content: '';
     position: fixed;
@@ -36,156 +18,113 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="10" cy="10" r="0.8" fill="rgba(255,235,59,0.7)"/><circle cx="90" cy="90" r="1.2" fill="rgba(255,193,7,0.6)"/><circle cx="50" cy="30" r="1" fill="rgba(255,245,157,0.8)"/><circle cx="30" cy="70" r="0.7" fill="rgba(255,152,0,0.5)"/><circle cx="70" cy="20" r="0.9" fill="rgba(255,215,0,0.7)"/></svg>');
-    background-size: 40px 40px;
-    opacity: 0.5;
-    animation: starTwinkle1 7s ease-in-out infinite;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><circle cx="50" cy="50" r="1" fill="white" opacity="0.8"/></svg>') repeat;
+    background-size: 100px 100px;
+    opacity: 0.2;
     pointer-events: none;
-    z-index: 0;
+    z-index: -1;
+    animation: twinkle 4s ease-in-out infinite;
 }
 
-/* Lớp sao 2 - Trung bình, lung linh */
-body::after {
-    content: '';
+/* Ngôi sao tương tác với chuột */
+.star-particle {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="40" r="1.3" fill="rgba(255,245,157,0.7)"/><circle cx="80" cy="60" r="1.5" fill="rgba(255,193,7,0.6)"/><circle cx="40" cy="80" r="1" fill="rgba(255,215,0,0.7)"/><circle cx="60" cy="10" r="1.2" fill="rgba(255,152,0,0.6)"/></svg>');
-    background-size: 60px 60px;
-    opacity: 0.4;
-    animation: starTwinkle2 9s ease-in-out infinite;
+    background: radial-gradient(circle, #fff 20%, #ffd700 80%);
+    border-radius: 50%;
     pointer-events: none;
-    z-index: 0;
+    z-index: -1;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
 }
 
-/* Lớp sao 3 - Lớn, thưa, sáng mạnh */
-body > .star-layer {
+/* Ngôi sao rơi nền */
+.falling-star {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="15" cy="25" r="1.5" fill="rgba(255,245,157,0.8)"/><circle cx="85" cy="75" r="2" fill="rgba(255,215,0,0.7)"/><circle cx="45" cy="55" r="1.8" fill="rgba(255,193,7,0.8)"/></svg>');
-    background-size: 90px 90px;
-    opacity: 0.45;
-    animation: starTwinkle3 11s ease-in-out infinite;
+    background: #fff;
+    border-radius: 50%;
     pointer-events: none;
-    z-index: 0;
+    z-index: -1;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
 }
 
-/* Hiệu ứng sao lung linh, mượt mà */
-@keyframes starTwinkle1 {
-    0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
-    50% { transform: translate(8px, -8px) scale(1.1); opacity: 0.8; }
-    100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+/* Animation cho ngôi sao tương tác */
+@keyframes moveStar {
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    100% {
+        opacity: 0;
+        /* Sử dụng giá trị cố định thay vì inline JS để tránh lỗi cú pháp */
+        transform: translate(-50%, -50%) translateY(-30px) translateX(20px) scale(1.5);
+    }
 }
 
-@keyframes starTwinkle2 {
-    0% { transform: translate(-6px, 6px) scale(1); opacity: 0.4; }
-    50% { transform: translate(6px, -6px) scale(1.15); opacity: 0.7; }
-    100% { transform: translate(-6px, 6px) scale(1); opacity: 0.4; }
+/* Animation cho sao rơi */
+@keyframes fall {
+    0% {
+        opacity: 0.8;
+        transform: translateY(0);
+    }
+    100% {
+        opacity: 0;
+        /* Giá trị cố định để tránh lỗi */
+        transform: translateY(100vh) translateX(50px);
+    }
 }
 
-@keyframes starTwinkle3 {
-    0% { transform: translate(4px, -4px) scale(1); opacity: 0.45; }
-    50% { transform: translate(-4px, 4px) scale(1.2); opacity: 0.75; }
-    100% { transform: translate(4px, -4px) scale(1); opacity: 0.45; }
+/* Hiệu ứng lấp lánh nền */
+@keyframes twinkle {
+    0%, 100% { opacity: 0.2; }
+    50% { opacity: 0.4; }
 }
 
-/* Hiệu ứng tương tác di chuột đẹp hơn */
-body > .mouse-glow {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 215, 0, 0.3), rgba(255, 152, 0, 0.15), transparent 20%);
-    opacity: 0;
-    transition: opacity 0.4s ease-in-out, transform 0.1s ease-out;
-    pointer-events: none;
-    z-index: 0;
-    filter: blur(10px);
-}
-
-body:hover > .mouse-glow {
-    opacity: 0.9;
-}
-
-/* Container sang trọng hơn */
 .container {
-    background: rgba(20, 20, 20, 0.92);
-    padding: 50px;
-    border-radius: 35px;
-    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), inset 0 0 20px rgba(255, 215, 0, 0.4);
-    border: 2px solid rgba(255, 215, 0, 0.8);
-    backdrop-filter: blur(18px);
-    animation: cosmicRise 2s ease-in-out;
+    background: rgba(20, 20, 20, 0.98);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), inset 0 0 10px rgba(255, 215, 0, 0.2);
+    border: 1px solid #ffd700;
+    animation: fadeIn 1.2s ease-out;
+    backdrop-filter: blur(5px);
     position: relative;
-    overflow: hidden;
-    z-index: 1;
 }
 
-.container::before {
-    content: '';
-    position: absolute;
-    top: -60%;
-    left: -60%;
-    width: 220%;
-    height: 220%;
-    background: radial-gradient(circle, rgba(255, 215, 0, 0.25), transparent 50%);
-    animation: cosmicGlow 7s ease-in-out infinite;
-}
-
-@keyframes cosmicGlow {
-    0% { transform: translate(-15%, -15%) scale(1); opacity: 0.4; }
-    50% { transform: translate(15%, 15%) scale(1.2); opacity: 0.7; }
-    100% { transform: translate(-15%, -15%) scale(1); opacity: 0.4; }
-}
-
-@keyframes cosmicRise {
-    from { opacity: 0; transform: translateY(50px); }
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-30px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* H1 với ánh sáng rực rỡ hơn */
 h1 {
     text-align: center;
-    color: #ffeb3b;
-    text-shadow: 0 0 15px #ffd700, 0 0 30px #ffd700, 0 0 60px rgba(255, 215, 0, 0.9), 0 0 100px rgba(255, 152, 0, 0.6);
-    font-size: 3.2rem;
-    animation: supernovaGlow 3s ease-in-out infinite alternate;
-    position: relative;
-    z-index: 1;
+    color: #ffd700;
+    text-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
+    font-size: 2.5em;
+    letter-spacing: 1px;
+    animation: glow 1.8s ease-in-out infinite alternate;
 }
 
-@keyframes supernovaGlow {
-    from { text-shadow: 0 0 5px #ffd700, 0 0 15px #ffd700, 0 0 30px rgba(255, 215, 0, 0.6); }
-    to { text-shadow: 0 0 20px #ffd700, 0 0 40px #ffd700, 0 0 70px rgba(255, 215, 0, 0.9); }
+@keyframes glow {
+    from { text-shadow: 0 0 8px rgba(255, 215, 0, 0.5); }
+    to { text-shadow: 0 0 25px rgba(255, 215, 0, 1); }
 }
 
-/* Tabs đẹp hơn */
 .tabs {
     display: flex;
     justify-content: center;
-    margin-bottom: 40px;
-    gap: 25px;
-    perspective: 1400px;
-    position: relative;
-    z-index: 1;
+    gap: 10px;
+    margin-bottom: 25px;
 }
 
 .tab-btn {
-    padding: 18px 45px;
+    padding: 14px 30px;
     border: none;
-    background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
-    color: #ffeb3b;
+    background: linear-gradient(135deg, #3a3a3a, #4a4a4a);
+    color: #ffd700;
     cursor: pointer;
-    font-size: 19px;
-    border-radius: 18px;
-    transition: all 0.5s ease-in-out;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7), inset 0 0 5px rgba(255, 215, 0, 0.3);
+    font-size: 16px;
+    border-radius: 12px;
+    transition: all 0.4s ease;
     position: relative;
     overflow: hidden;
 }
@@ -197,106 +136,83 @@ h1 {
     left: 50%;
     width: 0;
     height: 0;
-    background: rgba(255, 215, 0, 0.5);
+    background: rgba(255, 215, 0, 0.3);
     border-radius: 50%;
     transform: translate(-50%, -50%);
-    transition: width 0.6s ease-in-out, height 0.6s ease-in-out;
+    transition: width 0.5s ease, height 0.5s ease;
 }
 
 .tab-btn:hover::after {
-    width: 350%;
-    height: 350%;
+    width: 300px;
+    height: 300px;
 }
 
 .tab-btn:hover {
-    background: linear-gradient(45deg, #ffd700, #ffeb3b, #ffd700);
     color: #1a1a1a;
-    transform: scale(1.1) translateZ(20px); /* Thay rotate bằng scale */
-    box-shadow: 0 20px 40px rgba(255, 215, 0, 0.9), 0 0 25px rgba(255, 215, 0, 0.8); /* Ánh sáng lan tỏa */
+    background: #ffd700;
+    transform: translateY(-2px);
 }
 
 .tab-btn.active {
-    background: linear-gradient(45deg, #ffd700, #ffeb3b, #ffd700);
+    background: #ffd700;
     color: #1a1a1a;
-    transform: scale(1.05) translateZ(25px);
-    box-shadow: 0 0 35px rgba(255, 215, 0, 1);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
 }
 
-/* Tab content */
 .tab-content {
     display: none;
 }
 
 .tab-content.active {
     display: block;
-    animation: quantumFade 0.9s ease-in-out;
-    position: relative;
-    z-index: 1;
+    animation: slideIn 0.6s ease-out;
 }
 
-@keyframes quantumFade {
-    from { opacity: 0; transform: translateX(-50px) scale(0.95); }
-    to { opacity: 1; transform: translateX(0) scale(1); }
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-/* Input sang trọng hơn */
 input {
-    padding: 18px;
-    margin: 18px;
-    width: 280px;
-    border: 2px solid rgba(255, 215, 0, 0.8);
-    border-radius: 18px;
-    background: rgba(30, 30, 30, 0.95);
-    color: #ffeb3b;
-    font-size: 18px;
-    transition: all 0.5s ease-in-out;
-    position: relative;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6), inset 0 0 5px rgba(255, 215, 0, 0.3);
-    z-index: 1;
+    padding: 14px;
+    margin: 12px;
+    width: 220px;
+    border: 1px solid #ffd700;
+    border-radius: 10px;
+    background: rgba(60, 60, 60, 0.9);
+    color: #ffd700;
+    font-size: 16px;
+    transition: all 0.3s ease;
 }
 
 input:focus {
     outline: none;
     border-color: #ffeb3b;
-    box-shadow: 0 0 25px rgba(255, 215, 0, 1), inset 0 0 10px rgba(255, 215, 0, 0.6);
-    background: #252525;
-    transform: scale(1.03);
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.7);
+    background: rgba(80, 80, 80, 0.9);
 }
 
-/* Note nổi bật hơn */
 .note {
-    font-size: 17px;
+    font-size: 14px;
     color: #ffeb3b;
-    margin: 18px 0;
-    background: rgba(255, 215, 0, 0.3);
-    padding: 20px;
-    border-radius: 15px;
-    transition: all 0.5s ease-in-out;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5), inset 0 0 5px rgba(255, 215, 0, 0.4);
-    position: relative;
-    z-index: 1;
+    margin: 12px 0;
+    text-align: left;
+    background: rgba(255, 215, 0, 0.2);
+    padding: 12px;
+    border-radius: 8px;
+    border-left: 4px solid #ffd700;
 }
 
-.note:hover {
-    transform: translateY(-10px) scale(1.04);
-    background: rgba(255, 215, 0, 0.4);
-    box-shadow: 0 15px 30px rgba(255, 215, 0, 0.7);
-}
-
-/* Button chung với hiệu ứng mới */
 .btn {
-    padding: 18px 45px;
+    padding: 14px 30px;
     border: none;
-    border-radius: 18px;
+    border-radius: 10px;
     cursor: pointer;
-    font-size: 19px;
-    margin: 12px;
-    transition: all 0.5s ease-in-out;
+    font-size: 16px;
+    margin: 8px;
+    transition: all 0.4s ease;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);
-    transform-style: preserve-3d;
-    z-index: 1;
 }
 
 .btn::after {
@@ -306,271 +222,166 @@ input:focus {
     left: 50%;
     width: 0;
     height: 0;
-    background: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.3);
     border-radius: 50%;
     transform: translate(-50%, -50%);
-    transition: width 0.7s ease-in-out, height 0.7s ease-in-out;
+    transition: width 0.5s ease, height 0.5s ease;
 }
 
 .btn:hover::after {
-    width: 450%;
-    height: 450%;
+    width: 200px;
+    height: 200px;
 }
 
-/* Generate Button */
 .generate-btn {
-    background: linear-gradient(45deg, #ffd700, #ffeb3b, #ffd700);
+    background: linear-gradient(135deg, #ffd700, #ffeb3b);
     color: #1a1a1a;
 }
 
 .generate-btn:hover {
-    transform: scale(1.15) translateZ(20px); /* Thay rotate bằng scale */
-    box-shadow: 0 25px 50px rgba(255, 215, 0, 1), 0 0 30px rgba(255, 215, 0, 0.9); /* Ánh sáng lan tỏa */
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(255, 215, 0, 0.8);
 }
 
-/* Submit Link Button */
 .submit-link-btn {
-    background: linear-gradient(45deg, #0288d1, #03a9f4, #0288d1);
+    background: linear-gradient(135deg, #0288d1, #03a9f4);
     color: #fff;
 }
 
 .submit-link-btn:hover {
-    transform: scale(1.15) translateZ(20px); /* Thay rotate bằng scale */
-    box-shadow: 0 25px 50px rgba(2, 136, 209, 1), 0 0 30px rgba(2, 136, 209, 0.9); /* Ánh sáng lan tỏa */
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(2, 136, 209, 0.8);
 }
 
-/* Stop Button */
-.stop-btn {
-    background: linear-gradient(45deg, #b71c1c, #d32f2f, #b71c1c);
-    color: #fff;
-    display: none;
-}
-
-.stop-btn:hover {
-    transform: scale(1.15) translateZ(20px); /* Thay rotate bằng scale */
-    box-shadow: 0 25px 50px rgba(183, 28, 28, 1), 0 0 30px rgba(183, 28, 28, 0.9); /* Ánh sáng lan tỏa */
-}
-
-/* New Button */
-.new-btn {
-    background: linear-gradient(45deg, #0288d1, #03a9f4, #0288d1);
-    color: #fff;
-    display: none;
-}
-
-.new-btn:hover {
-    transform: scale(1.15) translateZ(20px); /* Thay rotate bằng scale */
-    box-shadow: 0 25px 50px rgba(2, 136, 209, 1), 0 0 30px rgba(2, 136, 209, 0.9); /* Ánh sáng lan tỏa */
-}
-
-/* Result và Link Display */
 #result, #linkDisplay {
-    margin-top: 40px;
+    margin-top: 25px;
     white-space: pre-wrap;
     text-align: center;
-    background: rgba(30, 30, 30, 0.95);
-    padding: 35px;
-    border-radius: 25px;
-    border: 2px solid rgba(255, 215, 0, 0.8);
-    color: #ffeb3b;
-    max-height: 550px;
+    background: rgba(50, 50, 50, 0.95);
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #ffd700;
+    color: #ffd700;
+    max-height: 450px;
     overflow-y: auto;
-    animation: nebulaPop 0.9s ease-in-out;
-    transition: all 0.5s ease-in-out;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.7), inset 0 0 5px rgba(255, 215, 0, 0.4);
-    position: relative;
-    z-index: 1;
+    animation: resultFade 0.6s ease-out;
 }
 
-#result:hover, #linkDisplay:hover {
-    transform: scale(1.04) translateZ(15px);
-    box-shadow: 0 20px 40px rgba(255, 215, 0, 0.8);
-}
-
-@keyframes nebulaPop {
-    from { opacity: 0; transform: scale(0.85); }
+@keyframes resultFade {
+    from { opacity: 0; transform: scale(0.98); }
     to { opacity: 1; transform: scale(1); }
 }
 
-/* Copy Button */
-.copy-btn {
-    position: absolute;
-    top: 18px;
-    right: 18px;
-    background: linear-gradient(45deg, #ffd700, #ffeb3b);
-    color: #1a1a1a;
-    padding: 14px 24px;
-    border: none;
-    border-radius: 15px;
-    cursor: pointer;
-    transition: all 0.5s ease-in-out;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
-    z-index: 1;
-}
-
-.copy-btn:hover {
-    transform: scale(1.25) translateZ(15px); /* Thay rotate bằng scale */
-    box-shadow: 0 20px 40px rgba(255, 215, 0, 1), 0 0 25px rgba(255, 215, 0, 0.9); /* Ánh sáng lan tỏa */
-}
-
-/* Donate Section */
 .donate-section {
-    margin-top: 70px;
+    margin-top: 40px;
     text-align: center;
-    padding: 40px;
-    background: rgba(20, 20, 20, 0.92);
-    border-radius: 25px;
-    border: 2px solid rgba(255, 215, 0, 0.8);
-    backdrop-filter: blur(12px);
-    animation: cosmicRise 2.2s ease-in-out;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8);
-    z-index: 1;
-}
-
-.donate-section::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255, 215, 0, 0.25), transparent 70%);
-    animation: cosmicGlow 8s ease-in-out infinite;
+    padding: 25px;
+    background: rgba(20, 20, 20, 0.98);
+    border-radius: 15px;
+    border: 1px solid #ffd700;
+    animation: fadeIn 1.8s ease-out;
 }
 
 .donate-section h3 {
-    color: #ffeb3b;
-    margin-bottom: 30px;
-    text-shadow: 0 0 20px rgba(255, 215, 0, 0.9);
-    font-size: 2rem;
-    position: relative;
-    z-index: 1;
+    color: #ffd700;
+    margin-bottom: 20px;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+    font-size: 1.8em;
 }
 
 .donate-section img {
-    max-width: 260px;
+    max-width: 220px;
     border: 2px solid #ffd700;
-    border-radius: 20px;
-    transition: all 0.6s ease-in-out;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
-    position: relative;
-    z-index: 1;
+    border-radius: 12px;
+    transition: all 0.4s ease;
 }
 
 .donate-section img:hover {
-    transform: scale(1.2) translateZ(15px); /* Xóa rotate */
-    box-shadow: 0 20px 40px rgba(255, 215, 0, 0.9);
+    transform: scale(1.08);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
 }
 
-/* Link */
 a {
     color: #ffeb3b;
     text-decoration: none;
-    transition: all 0.5s ease-in-out;
-    position: relative;
-    z-index: 1;
+    transition: color 0.3s ease;
 }
 
 a:hover {
-    color: #ffd700;
-    text-shadow: 0 0 20px #ffd700;
+    color: #fff;
+    text-decoration: underline;
 }
 
-/* Link Item */
-.link-item {
-    margin: 15px auto;
-    padding: 20px 25px;
-    background: linear-gradient(135deg, #2a2a2a, #3a3a3a);
-    border-radius: 20px;
-    border: 2px solid rgba(255, 215, 0, 0.7);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
-    width: 100%;
-    max-width: 550px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    transition: all 0.6s ease-in-out;
-    transform-style: preserve-3d;
-    position: relative;
-    z-index: 1;
-}
-
-.link-item:hover {
-    transform: translateY(-10px) scale(1.05); /* Xóa rotate */
-    box-shadow: 0 20px 40px rgba(255, 215, 0, 0.8);
-    border-color: #ffeb3b;
-}
-
-.link-item .link-name {
-    font-size: 20px;
-    font-weight: bold;
-    color: #ffd700;
-    margin-bottom: 6px;
-    text-shadow: 0 0 15px #ffd700;
-}
-
-/* Social Links */
 .social-links {
-    margin-top: 35px;
-    position: relative;
-    z-index: 1;
+    margin-top: 25px;
 }
 
 .social-links h4 {
     color: #ffd700;
-    margin: 25px 0;
-    text-shadow: 0 0 15px rgba(255, 215, 0, 0.9);
-    font-size: 1.8rem;
+    margin: 15px 0;
+    text-shadow: 0 0 6px rgba(255, 215, 0, 0.6);
+    font-size: 1.5em;
 }
 
 .social-links div {
     display: flex;
     justify-content: center;
-    gap: 30px;
+    gap: 20px;
     flex-wrap: wrap;
 }
 
 .social-btn {
     display: inline-flex;
     align-items: center;
-    padding: 16px 30px;
-    border-radius: 15px;
+    padding: 12px 20px;
+    border-radius: 10px;
+    text-decoration: none;
     color: #fff;
-    font-size: 18px;
-    transition: all 0.6s ease-in-out;
-    border: 2px solid rgba(255, 215, 0, 0.7);
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
-    transform-style: preserve-3d;
-    z-index: 1;
+    font-size: 16px;
+    transition: all 0.4s ease;
+    border: 1px solid #ffd700;
 }
 
 .social-btn img {
-    width: 50px;
-    height: 50px;
-    margin-right: 15px;
-    transition: transform 0.5s ease-in-out;
-}
-
-.social-btn:hover img {
-    transform: scale(1.3); /* Xóa rotate */
+    width: 42px;
+    height: 42px;
+    margin-right: 10px;
+    filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.5));
 }
 
 .social-btn:hover {
-    transform: scale(1.1) translateZ(10px); /* Thay rotate bằng scale */
-    box-shadow: 0 20px 40px rgba(255, 215, 0, 0.9), 0 0 20px rgba(255, 215, 0, 0.7); /* Ánh sáng lan tỏa */
-    border-color: #ffd700;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 15px rgba(255, 215, 0, 0.6);
 }
 
-.github { background: linear-gradient(45deg, #24292e, #333, #24292e); }
-.github:hover { background: linear-gradient(45deg, #333, #444, #333); }
-.discord { background: linear-gradient(45deg, #5865F2, #7289da, #5865F2); }
-.discord:hover { background: linear-gradient(45deg, #7289da, #8a9ff5, #7289da); }
-.x { background: linear-gradient(45deg, #000000, #222, #000000); }
-.x:hover { background: linear-gradient(45deg, #222, #333, #222); }
-.telegram { background: linear-gradient(45deg, #0088cc, #00aced, #0088cc); }
-.telegram:hover { background: linear-gradient(45deg, #00aced, #33c1ff, #00aced); }
+.github {
+    background: linear-gradient(135deg, #24292e, #3a3f44);
+}
+
+.github:hover {
+    background: linear-gradient(135deg, #3a3f44, #505962);
+}
+
+.discord {
+    background: linear-gradient(135deg, #5865f2, #7289da);
+}
+
+.discord:hover {
+    background: linear-gradient(135deg, #7289da, #8ea1e1);
+}
+
+.x {
+    background: linear-gradient(135deg, #000000, #1a1a1a);
+}
+
+.x:hover {
+    background: linear-gradient(135deg, #1a1a1a, #333333);
+}
+
+.telegram {
+    background: linear-gradient(135deg, #0088cc, #00aced);
+}
+
+.telegram:hover {
+    background: linear-gradient(135deg, #00aced, #33c1ff);
+}

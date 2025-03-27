@@ -7,8 +7,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="star-layer"></div>
-    <div class="mouse-glow"></div>
+   
     <div class="container">
         <h1>GJTOOL</h1>
         <div class="tabs">
@@ -330,29 +329,55 @@
         });
     </script>
    
-    <script>
-        let mouseX = 0, mouseY = 0;
-    let currentX = 0, currentY = 0;
-    const glow = document.querySelector('.mouse-glow');
+   <script>
+    // Tab switching
+    document.querySelectorAll('.tab-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
 
-    document.addEventListener('mousemove', (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
+            button.classList.add('active');
+            document.getElementById(button.dataset.tab).classList.add('active');
+        });
     });
 
-    function lerp(start, end, factor) {
-        return start + (end - start) * factor;
+    // Interactive stars on mouse move
+    document.addEventListener('mousemove', (e) => {
+        if (Math.random() > 0.7) { // Giảm mật độ sao
+            const star = document.createElement('div');
+            star.className = 'star-particle';
+            star.style.left = `${e.clientX}px`;
+            star.style.top = `${e.clientY}px`;
+
+            const size = Math.random() * 4 + 2; // 2-6px
+            const duration = Math.random() * 1 + 0.5; // 0.5-1.5s
+            star.style.width = `${size}px`;
+            star.style.height = `${size}px`;
+            star.style.animation = `moveStar ${duration}s ease-out forwards`;
+
+            document.body.appendChild(star);
+            setTimeout(() => star.remove(), duration * 1000);
+        }
+    });
+
+    // Background falling stars
+    function createFallingStar() {
+        const star = document.createElement('div');
+        star.className = 'falling-star';
+        star.style.left = `${Math.random() * 100}vw`;
+        star.style.top = `-${Math.random() * 20}px`;
+        const size = Math.random() * 3 + 1; // 1-4px
+        star.style.width = `${size}px`;
+        star.style.height = `${size}px`;
+        const duration = Math.random() * 5 + 3; // 3-8s
+        star.style.animation = `fall ${duration}s linear forwards`;
+
+        document.body.appendChild(star);
+        setTimeout(() => star.remove(), duration * 1000);
     }
 
-    function updateGlow() {
-        currentX = lerp(currentX, mouseX, 0.1); // Tạo độ trễ mượt
-        currentY = lerp(currentY, mouseY, 0.1);
-        glow.style.setProperty('--mouse-x', `${currentX}px`);
-        glow.style.setProperty('--mouse-y', `${currentY}px`);
-        requestAnimationFrame(updateGlow);
-    }
-
-    updateGlow();
-    </script>
+    // Tạo sao rơi định kỳ
+    setInterval(createFallingStar, 300);
+</script>
 </body>
 </html>
