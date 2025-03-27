@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="star-layer"></div>
+    <div class="mouse-glow"></div>
     <div class="container">
         <h1>GJTOOL</h1>
         <div class="tabs">
@@ -326,6 +328,31 @@
 
             document.getElementById('submitLinkBtn').addEventListener('click', submitLink);
         });
+    </script>
+   
+    <script>
+        let mouseX = 0, mouseY = 0;
+    let currentX = 0, currentY = 0;
+    const glow = document.querySelector('.mouse-glow');
+
+    document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+    });
+
+    function lerp(start, end, factor) {
+        return start + (end - start) * factor;
+    }
+
+    function updateGlow() {
+        currentX = lerp(currentX, mouseX, 0.1); // Tạo độ trễ mượt
+        currentY = lerp(currentY, mouseY, 0.1);
+        glow.style.setProperty('--mouse-x', `${currentX}px`);
+        glow.style.setProperty('--mouse-y', `${currentY}px`);
+        requestAnimationFrame(updateGlow);
+    }
+
+    updateGlow();
     </script>
 </body>
 </html>
