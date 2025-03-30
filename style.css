@@ -371,6 +371,18 @@ input:focus {
     text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
     font-size: 1.5em;
 }
+.copy-all-btn {
+    background: linear-gradient(135deg, #4caf50, #66bb6a);
+    color: #fff;
+    width: 150px;
+    margin: 10px auto;
+    display: block;
+}
+
+.copy-all-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(76, 175, 80, 0.8);
+}
 
 .donate-section img {
     max-width: 200px;

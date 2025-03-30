@@ -47,7 +47,11 @@
             <button class="btn new-btn" id="newMultipleBtn">Tạo mới</button>
         </div>
 
-        <div id="result"></div>
+        <!-- Nút Copy All ở trên kết quả -->
+        <div id="result-container">
+            <button class="btn copy-all-btn" id="copyAllBtn" style="display: none;">Copy All</button>
+            <div id="result"></div>
+        </div>
     </div>
 
     <!-- Thư viện và script -->
@@ -80,10 +84,9 @@
                 const data = await response.json();
 
                 if (data.success && data.address) {
-                    resultDiv.innerHTML = 
-                        `Address: ${data.address}\nPrivate Key: ${data.privateKey}\nSeed Phrase: ${data.mnemonic}` +
-                        '<button class="copy-btn" onclick="copyResult()">Copy</button>';
+                    resultDiv.innerHTML = `Address: ${data.address}\nPrivate Key: ${data.privateKey}\nSeed Phrase: ${data.mnemonic}`;
                     document.querySelector('#custom .new-btn').style.display = 'inline-block';
+                    document.getElementById('copyAllBtn').style.display = 'block';
                 } else {
                     resultDiv.innerHTML = 'Error: ' + (data.error || 'Tạo ví thất bại');
                 }
@@ -123,9 +126,9 @@
                     data.wallets.forEach((wallet, index) => {
                         resultText += `Wallet #${index + 1}:\nAddress: ${wallet.address}\nPrivate Key: ${wallet.privateKey}\nMnemonic: ${wallet.mnemonic}\n----------------------------------------\n`;
                     });
-                    resultDiv.innerHTML = resultText +
-                        '<button class="copy-btn" onclick="copyResult()">Copy</button>';
+                    resultDiv.innerHTML = resultText;
                     document.querySelector('#multiple .new-btn').style.display = 'inline-block';
+                    document.getElementById('copyAllBtn').style.display = 'block';
                 } else {
                     resultDiv.innerHTML = 'Error: ' + (data.error || 'No wallets generated');
                 }
@@ -144,15 +147,16 @@
         }
 
         window.copyResult = function() {
-            const resultText = document.getElementById('result').textContent.replace('Copy', '').trim();
+            const resultText = document.getElementById('result').textContent.trim();
             navigator.clipboard.writeText(resultText);
-            alert('Đã sao chép vào bộ nhớ tạm!');
+            alert('Đã sao chép toàn bộ kết quả vào bộ nhớ tạm!');
         }
 
         function resetForm(tabId) {
             if (tabId === 'custom') document.getElementById('ending').value = '';
             if (tabId === 'multiple') document.getElementById('numWallets').value = '';
             document.getElementById('result').innerHTML = '';
+            document.getElementById('copyAllBtn').style.display = 'none';
 
             const newBtn = document.querySelector(`#${tabId} .new-btn`);
             const generateBtn = document.querySelector(`#${tabId} .generate-btn`);
@@ -198,6 +202,8 @@
             document.getElementById('generateMultipleBtn').addEventListener('click', generateMultipleWallets);
             document.getElementById('stopMultipleBtn').addEventListener('click', stopGeneration);
             document.getElementById('newMultipleBtn').addEventListener('click', () => resetForm('multiple'));
+
+            document.getElementById('copyAllBtn').addEventListener('click', copyResult);
         });
     </script>
 
