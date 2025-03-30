@@ -2,7 +2,7 @@ body {
     font-family: 'Poppins', sans-serif;
     max-width: 900px;
     margin: 0 auto;
-    padding: 40px 20px;
+    padding: 80px 20px 40px 20px; /* Thêm padding-top để tránh chồng lên menu */
     background: #0a0a0a;
     color: #ffd700;
     line-height: 1.6;
@@ -10,7 +10,6 @@ body {
     overflow-x: hidden;
 }
 
-/* Nền sao tĩnh lấp lánh */
 body::before {
     content: '';
     position: fixed;
@@ -26,7 +25,6 @@ body::before {
     animation: twinkle 4s ease-in-out infinite;
 }
 
-/* Ngôi sao tương tác với chuột */
 .star-particle {
     position: fixed;
     background: radial-gradient(circle, #fff 20%, #ffd700 80%);
@@ -37,7 +35,6 @@ body::before {
     box-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
 }
 
-/* Ngôi sao rơi nền */
 .falling-star {
     position: fixed;
     background: #fff;
@@ -47,41 +44,82 @@ body::before {
     box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
 }
 
-/* Animation cho ngôi sao tương tác */
 @keyframes moveStar {
-    0% {
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
-    }
-    100% {
-        opacity: 0;
-        /* Sử dụng giá trị cố định thay vì inline JS để tránh lỗi cú pháp */
-        transform: translate(-50%, -50%) translateY(-30px) translateX(20px) scale(1.5);
-    }
+    0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    100% { opacity: 0; transform: translate(-50%, -50%) translateY(-30px) translateX(20px) scale(1.5); }
 }
 
-/* Animation cho sao rơi */
 @keyframes fall {
-    0% {
-        opacity: 0.8;
-        transform: translateY(0);
-    }
-    100% {
-        opacity: 0;
-        /* Giá trị cố định để tránh lỗi */
-        transform: translateY(100vh) translateX(50px);
-    }
+    0% { opacity: 0.8; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(100vh) translateX(50px); }
 }
 
-/* Hiệu ứng lấp lánh nền */
 @keyframes twinkle {
     0%, 100% { opacity: 0.2; }
     50% { opacity: 0.4; }
 }
 
+/* Menu điều hướng */
+.nav-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(20, 20, 20, 0.95);
+    padding: 10px 0;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+}
+
+.nav-btn {
+    padding: 8px 20px;
+    background: linear-gradient(135deg, #3a3a3a, #4a4a4a);
+    color: #ffd700;
+    font-size: 14px;
+    border-radius: 8px;
+    text-decoration: none; /* Xóa gạch chân */
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 215, 0, 0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.5s ease, height 0.5s ease;
+}
+
+.nav-btn:hover::after {
+    width: 200px;
+    height: 200px;
+}
+
+.nav-btn:hover {
+    color: #1a1a1a;
+    background: #ffd700;
+    transform: translateY(-2px);
+    text-decoration: none; /* Đảm bảo không hiện gạch chân khi hover */
+}
+
+.nav-btn.active {
+    background: #ffd700;
+    color: #1a1a1a;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+}
+
 .container {
     background: rgba(20, 20, 20, 0.98);
-    padding: 30px;
+    padding: 20px;
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), inset 0 0 10px rgba(255, 215, 0, 0.2);
     border: 1px solid #ffd700;
@@ -99,9 +137,10 @@ h1 {
     text-align: center;
     color: #ffd700;
     text-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
-    font-size: 2.5em;
+    font-size: 2em;
     letter-spacing: 1px;
     animation: glow 1.8s ease-in-out infinite alternate;
+    margin-bottom: 15px;
 }
 
 @keyframes glow {
@@ -112,18 +151,18 @@ h1 {
 .tabs {
     display: flex;
     justify-content: center;
-    gap: 10px;
-    margin-bottom: 25px;
+    gap: 8px;
+    margin-bottom: 15px;
 }
 
 .tab-btn {
-    padding: 14px 30px;
+    padding: 10px 20px;
     border: none;
     background: linear-gradient(135deg, #3a3a3a, #4a4a4a);
     color: #ffd700;
     cursor: pointer;
-    font-size: 16px;
-    border-radius: 12px;
+    font-size: 14px;
+    border-radius: 10px;
     transition: all 0.4s ease;
     position: relative;
     overflow: hidden;
@@ -143,8 +182,8 @@ h1 {
 }
 
 .tab-btn:hover::after {
-    width: 300px;
-    height: 300px;
+    width: 200px;
+    height: 200px;
 }
 
 .tab-btn:hover {
@@ -156,7 +195,7 @@ h1 {
 .tab-btn.active {
     background: #ffd700;
     color: #1a1a1a;
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
 }
 
 .tab-content {
@@ -174,42 +213,42 @@ h1 {
 }
 
 input {
-    padding: 14px;
-    margin: 12px;
-    width: 220px;
+    padding: 10px;
+    margin: 8px;
+    width: 200px;
     border: 1px solid #ffd700;
-    border-radius: 10px;
+    border-radius: 8px;
     background: rgba(60, 60, 60, 0.9);
     color: #ffd700;
-    font-size: 16px;
+    font-size: 14px;
     transition: all 0.3s ease;
 }
 
 input:focus {
     outline: none;
     border-color: #ffeb3b;
-    box-shadow: 0 0 12px rgba(255, 215, 0, 0.7);
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
     background: rgba(80, 80, 80, 0.9);
 }
 
 .note {
-    font-size: 14px;
+    font-size: 12px;
     color: #ffeb3b;
-    margin: 12px 0;
+    margin: 8px 0;
     text-align: left;
     background: rgba(255, 215, 0, 0.2);
-    padding: 12px;
-    border-radius: 8px;
-    border-left: 4px solid #ffd700;
+    padding: 8px;
+    border-radius: 6px;
+    border-left: 3px solid #ffd700;
 }
 
 .btn {
-    padding: 14px 30px;
+    padding: 10px 20px;
     border: none;
-    border-radius: 10px;
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 16px;
-    margin: 8px;
+    font-size: 14px;
+    margin: 6px;
     transition: all 0.4s ease;
     position: relative;
     overflow: hidden;
@@ -229,8 +268,8 @@ input:focus {
 }
 
 .btn:hover::after {
-    width: 200px;
-    height: 200px;
+    width: 150px;
+    height: 150px;
 }
 
 .generate-btn {
@@ -239,32 +278,38 @@ input:focus {
 }
 
 .generate-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(255, 215, 0, 0.8);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(255, 215, 0, 0.8);
 }
 
 .submit-link-btn {
     background: linear-gradient(135deg, #0288d1, #03a9f4);
     color: #fff;
+    width: 150px;
+    margin: 6px auto;
+    display: block;
 }
 
 .submit-link-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(2, 136, 209, 0.8);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(2, 136, 209, 0.8);
 }
 
 #result, #linkDisplay {
-    margin-top: 25px;
+    margin-top: 10px;
     white-space: pre-wrap;
-    text-align: center;
     background: rgba(50, 50, 50, 0.95);
-    padding: 20px;
-    border-radius: 12px;
+    padding: 15px;
+    border-radius: 10px;
     border: 1px solid #ffd700;
     color: #ffd700;
-    max-height: 450px;
+    max-height: 400px;
     overflow-y: auto;
     animation: resultFade 0.6s ease-out;
+}
+
+#linkDisplay {
+    text-align: left;
 }
 
 @keyframes resultFade {
@@ -272,33 +317,71 @@ input:focus {
     to { opacity: 1; transform: scale(1); }
 }
 
+.link-item {
+    margin-bottom: 8px;
+    padding: 8px;
+    background: rgba(30, 30, 30, 0.9);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+.link-item:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(255, 215, 0, 0.4);
+    border-color: #ffd700;
+}
+
+.link-name {
+    font-size: 16px;
+    font-weight: bold;
+    color: #ffeb3b;
+    margin-bottom: 2px;
+    text-shadow: 0 0 3px rgba(255, 215, 0, 0.5);
+}
+
+.link-item p {
+    margin: 1px 0;
+    font-size: 12px;
+}
+
+.link-item a {
+    color: #03a9f4;
+    word-break: break-all;
+}
+
+.link-item a:hover {
+    color: #fff;
+    text-decoration: underline;
+}
+
 .donate-section {
-    margin-top: 40px;
+    margin-top: 30px;
     text-align: center;
-    padding: 25px;
+    padding: 20px;
     background: rgba(20, 20, 20, 0.98);
-    border-radius: 15px;
+    border-radius: 12px;
     border: 1px solid #ffd700;
     animation: fadeIn 1.8s ease-out;
 }
 
 .donate-section h3 {
     color: #ffd700;
-    margin-bottom: 20px;
-    text-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
-    font-size: 1.8em;
+    margin-bottom: 15px;
+    text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+    font-size: 1.5em;
 }
 
 .donate-section img {
-    max-width: 220px;
+    max-width: 200px;
     border: 2px solid #ffd700;
-    border-radius: 12px;
+    border-radius: 10px;
     transition: all 0.4s ease;
 }
 
 .donate-section img:hover {
-    transform: scale(1.08);
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
 }
 
 a {
@@ -313,45 +396,45 @@ a:hover {
 }
 
 .social-links {
-    margin-top: 25px;
+    margin-top: 20px;
 }
 
 .social-links h4 {
     color: #ffd700;
-    margin: 15px 0;
-    text-shadow: 0 0 6px rgba(255, 215, 0, 0.6);
-    font-size: 1.5em;
+    margin: 10px 0;
+    text-shadow: 0 0 5px rgba(255, 215, 0, 0.6);
+    font-size: 1.3em;
 }
 
 .social-links div {
     display: flex;
     justify-content: center;
-    gap: 20px;
+    gap: 15px;
     flex-wrap: wrap;
 }
 
 .social-btn {
     display: inline-flex;
     align-items: center;
-    padding: 12px 20px;
-    border-radius: 10px;
+    padding: 10px 15px;
+    border-radius: 8px;
     text-decoration: none;
     color: #fff;
-    font-size: 16px;
+    font-size: 14px;
     transition: all 0.4s ease;
     border: 1px solid #ffd700;
 }
 
 .social-btn img {
-    width: 42px;
-    height: 42px;
-    margin-right: 10px;
-    filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.5));
+    width: 36px;
+    height: 36px;
+    margin-right: 8px;
+    filter: drop-shadow(0 0 3px rgba(255, 215, 0, 0.5));
 }
 
 .social-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 15px rgba(255, 215, 0, 0.6);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(255, 215, 0, 0.6);
 }
 
 .github {
@@ -384,4 +467,23 @@ a:hover {
 
 .telegram:hover {
     background: linear-gradient(135deg, #00aced, #33c1ff);
+}
+
+/* Định dạng thêm cho trang giới thiệu */
+.section {
+    margin-bottom: 20px;
+}
+
+h2 {
+    color: #ffd700;
+    font-size: 1.5em;
+    margin-bottom: 10px;
+    text-shadow: 0 0 5px rgba(255, 215, 0, 0.6);
+}
+
+.intro-text {
+    text-align: center;
+    font-size: 16px;
+    margin-bottom: 20px;
+    color: #ffeb3b;
 }

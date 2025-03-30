@@ -3,17 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wallet Generator & Airdrop Tool</title>
+    <title>GJTOOL - Wallet Tools</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/x-icon" href="./img/gj.jfif">
 </head>
 <body>
-   
+
+    <!-- Menu điều hướng -->
+    <nav class="nav-menu">
+        <a href="gjhome.html" class="nav-btn">Home</a>
+        <a href="link-claim-airdrop.html" class="nav-btn">Link Claim Airdrop</a>
+        <a href="gjtool.html" class="nav-btn active">Wallet Tools</a>
+    </nav>
+
     <div class="container">
         <h1>GJTOOL</h1>
         <div class="tabs">
             <button class="tab-btn active" data-tab="custom">Custom Wallet</button>
             <button class="tab-btn" data-tab="multiple">Multiple Wallets</button>
-            <button class="tab-btn" data-tab="airdrop">Link Check Airdrop</button>
         </div>
 
         <div id="custom" class="tab-content active">
@@ -40,139 +47,14 @@
             <button class="btn new-btn" id="newMultipleBtn">Tạo mới</button>
         </div>
 
-        <div id="airdrop" class="tab-content">
-            <input type="text" id="linkName" placeholder="Tên link (e.g., Airdrop XYZ)">
-            <input type="text" id="linkInput" placeholder="Nhập link airdrop">
-            <button class="btn submit-link-btn" id="submitLinkBtn">Gửi Link</button>
-            <div id="linkDisplay">Chưa có link nào được gửi...</div>
-        </div>
-
         <div id="result"></div>
-
-        <!-- Phần Donate và Liên kết xã hội -->
-        <div class="donate-section">
-            <h3>Support Us</h3>
-            <p>Donate cho mình để mình nâng cấp máy chủ nhé!</p>
-            <img src="./img/qrdonate.jpg" alt="Donate QR Code">
-            <div class="social-links">
-                <h4>Follow Us</h4>
-                <div>
-                    <a href="https://github.com/tdat05gj" target="_blank" class="social-btn github">
-                        <img src="https://cdn-icons-png.flaticon.com/512/25/25231.png" alt="GitHub">
-                        GitHub
-                    </a>
-                    <a href="https://discord.gg/UJmwvgvA2e" target="_blank" class="social-btn discord">
-                        <img src="https://cdn-icons-png.flaticon.com/512/2111/2111370.png" alt="Discord">
-                        Discord
-                    </a>
-                    <a href="https://x.com/tdat_gj" target="_blank" class="social-btn x">
-                        <img src="https://cdn-icons-png.flaticon.com/512/733/733635.png" alt="X">
-                        X
-                    </a>
-                    <a href="https://t.me/td_gj" target="_blank" class="social-btn telegram">
-                        <img src="https://cdn-icons-png.flaticon.com/512/2111/2111646.png" alt="Telegram">
-                        Telegram
-                    </a>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- Thư viện và script -->
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.0/dist/ethers.umd.min.js"></script>
     <script type="module">
-        // Firebase SDK
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-
-        // Firebase configuration mã hóa Base64
-        const encodedFirebaseConfig = "eyJhcGlLZXkiOiJBSXphU3lCYTQxY01nTXQtaDA3Vm9HY2hudW42VzVVY204Q2ZLY28iLCJhdXRoRG9tYWluIjoiZ2phaXItNWE2ZWYuZmlyZWJhc2VhcHAuY29tIiwicHJvamVjdElkIjoiZ2phaXItNWE2ZWYiLCJzdG9yYWdlQnVja2V0IjoiZ2phaXItNWE2ZWYuZmlyZWJhc2VzdG9yYWdlLmFwcCIsIm1lc3NhZ2luZ1NlbmRlcklkIjoiOTA1NjEyMzM0MDYwIiwiYXBwSWQiOiIxOjkwNTYxMjMzNDA2MDp3ZWI6N2FiMDA2MDkxZTY2NDU2ODYyZTZjOSIsIm1lYXN1cmVtZW50SWQiOiJHLVhXQkU4VzJNRVYifQ==";
-
-        // Giải mã Base64 thành object
-        const firebaseConfig = JSON.parse(atob(encodedFirebaseConfig));
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
         let abortController = null;
 
-        function simpleHash(str) {
-            let hash = 0;
-            for (let i = 0; i < str.length; i++) {
-                hash = ((hash << 5) - hash) + str.charCodeAt(i);
-                hash = hash & hash; // Convert to 32bit integer
-            }
-            return hash;
-        }
-
-        const SECRET_HASH = 99526;
-
-        // Hàm gửi link
-        async function submitLink() {
-            const linkName = document.getElementById('linkName').value.trim();
-            const link = document.getElementById('linkInput').value.trim();
-
-            if (!link) {
-                alert('Vui lòng nhập link hợp lệ!');
-                return;
-            }
-            if (!linkName) {
-                alert('Vui lòng nhập tên link!');
-                return;
-            }
-
-            const password = prompt("Nhập mã để gửi link:");
-            if (simpleHash(password) !== SECRET_HASH) {
-                alert("Mã sai, bạn không có quyền gửi link!");
-                return;
-            }
-
-            const timestamp = new Date().toLocaleString('vi-VN', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-            try {
-                await addDoc(collection(db, "links"), {
-                    name: linkName,
-                    link: link,
-                    timestamp: timestamp,
-                    createdAt: new Date().toISOString()
-                });
-                document.getElementById('linkName').value = '';
-                document.getElementById('linkInput').value = '';
-                loadLinks();
-            } catch (error) {
-                alert('Lỗi khi gửi link: ' + error.message);
-            }
-        }
-
-        // Hàm tải danh sách link
-        async function loadLinks() {
-            const linkDisplay = document.getElementById('linkDisplay');
-            try {
-                const q = query(collection(db, "links"), orderBy("createdAt", "desc"));
-                const querySnapshot = await getDocs(q);
-
-                if (querySnapshot.empty) {
-                    linkDisplay.innerHTML = 'Chưa có link nào được gửi...';
-                } else {
-                    let linkList = '';
-                    querySnapshot.forEach((doc) => {
-                        const data = doc.data();
-                        linkList += `
-                            <div class="link-item">
-                                <div class="link-name">${data.name}</div>
-                                <p>Link: <a href="${data.link}" target="_blank">${data.link}</a></p>
-                                <p>Thời gian: ${data.timestamp}</p>
-                            </div>
-                        `;
-                    });
-                    linkDisplay.innerHTML = linkList;
-                }
-            } catch (error) {
-                linkDisplay.innerHTML = 'Lỗi tải danh sách link: ' + error.message;
-            }
-        }
-
-        // Hàm tạo ví tùy chỉnh
         async function generateCustomWallet() {
             const ending = document.getElementById('ending').value.trim();
             if (!ending) {
@@ -212,7 +94,6 @@
             }
         }
 
-        // Hàm tạo nhiều ví
         async function generateMultipleWallets() {
             const numWallets = parseInt(document.getElementById('numWallets').value);
             if (!numWallets || numWallets < 1) {
@@ -255,7 +136,6 @@
             }
         }
 
-        // Các hàm hỗ trợ
         function stopGeneration() {
             if (abortController) {
                 abortController.abort();
@@ -272,10 +152,6 @@
         function resetForm(tabId) {
             if (tabId === 'custom') document.getElementById('ending').value = '';
             if (tabId === 'multiple') document.getElementById('numWallets').value = '';
-            if (tabId === 'airdrop') {
-                document.getElementById('linkName').value = '';
-                document.getElementById('linkInput').value = '';
-            }
             document.getElementById('result').innerHTML = '';
 
             const newBtn = document.querySelector(`#${tabId} .new-btn`);
@@ -308,10 +184,8 @@
             document.getElementById(tabId).classList.add('active');
             document.querySelector(`.tab-btn[data-tab="${tabId}"]`).classList.add('active');
             resetForm(tabId);
-            if (tabId === 'airdrop') loadLinks();
         }
 
-        // Thêm event listener
         document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.tab-btn').forEach(button => {
                 button.addEventListener('click', () => showTab(button.getAttribute('data-tab')));
@@ -324,60 +198,45 @@
             document.getElementById('generateMultipleBtn').addEventListener('click', generateMultipleWallets);
             document.getElementById('stopMultipleBtn').addEventListener('click', stopGeneration);
             document.getElementById('newMultipleBtn').addEventListener('click', () => resetForm('multiple'));
-
-            document.getElementById('submitLinkBtn').addEventListener('click', submitLink);
         });
     </script>
-   
-   <script>
-    // Tab switching
-    document.querySelectorAll('.tab-btn').forEach(button => {
-        button.addEventListener('click', () => {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
 
-            button.classList.add('active');
-            document.getElementById(button.dataset.tab).classList.add('active');
+    <!-- Script cho hiệu ứng sao -->
+    <script>
+        document.addEventListener('mousemove', (e) => {
+            if (Math.random() > 0.7) {
+                const star = document.createElement('div');
+                star.className = 'star-particle';
+                star.style.left = `${e.clientX}px`;
+                star.style.top = `${e.clientY}px`;
+
+                const size = Math.random() * 4 + 2;
+                const duration = Math.random() * 1 + 0.5;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.animation = `moveStar ${duration}s ease-out forwards`;
+
+                document.body.appendChild(star);
+                setTimeout(() => star.remove(), duration * 1000);
+            }
         });
-    });
 
-    // Interactive stars on mouse move
-    document.addEventListener('mousemove', (e) => {
-        if (Math.random() > 0.7) { // Giảm mật độ sao
+        function createFallingStar() {
             const star = document.createElement('div');
-            star.className = 'star-particle';
-            star.style.left = `${e.clientX}px`;
-            star.style.top = `${e.clientY}px`;
-
-            const size = Math.random() * 4 + 2; // 2-6px
-            const duration = Math.random() * 1 + 0.5; // 0.5-1.5s
+            star.className = 'falling-star';
+            star.style.left = `${Math.random() * 100}vw`;
+            star.style.top = `-${Math.random() * 20}px`;
+            const size = Math.random() * 3 + 1;
             star.style.width = `${size}px`;
             star.style.height = `${size}px`;
-            star.style.animation = `moveStar ${duration}s ease-out forwards`;
+            const duration = Math.random() * 5 + 3;
+            star.style.animation = `fall ${duration}s linear forwards`;
 
             document.body.appendChild(star);
             setTimeout(() => star.remove(), duration * 1000);
         }
-    });
 
-    // Background falling stars
-    function createFallingStar() {
-        const star = document.createElement('div');
-        star.className = 'falling-star';
-        star.style.left = `${Math.random() * 100}vw`;
-        star.style.top = `-${Math.random() * 20}px`;
-        const size = Math.random() * 3 + 1; // 1-4px
-        star.style.width = `${size}px`;
-        star.style.height = `${size}px`;
-        const duration = Math.random() * 5 + 3; // 3-8s
-        star.style.animation = `fall ${duration}s linear forwards`;
-
-        document.body.appendChild(star);
-        setTimeout(() => star.remove(), duration * 1000);
-    }
-
-    // Tạo sao rơi định kỳ
-    setInterval(createFallingStar, 300);
-</script>
+        setInterval(createFallingStar, 300);
+    </script>
 </body>
 </html>
