@@ -6,9 +6,9 @@
     <title>GJTOOL - Airdrop</title>
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/x-icon" href="./img/favicon.ico">
+    <link rel="preload" href="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js" as="script">
 </head>
 <body>
-    <!-- Menu điều hướng -->
     <nav class="nav-menu">
         <a href="index.html" class="nav-btn">Home</a>
         <a href="link-claim-airdrop.html" class="nav-btn active">Airdrop</a>
@@ -17,13 +17,9 @@
 
     <div class="container">
         <h1>GJTOOL - Airdrop</h1>
-
-        <!-- Phần Link Claim Airdrop -->
         <div class="section">
             <h2>Link Claim Airdrop</h2>
-            <!-- Danh sách link hiển thị trước -->
             <div id="linkDisplay">Chưa có link nào được gửi...</div>
-            <!-- Phần gửi link được di chuyển xuống dưới -->
             <div class="submit-section">
                 <input type="text" id="linkName" placeholder="Tên">
                 <input type="text" id="linkInput" placeholder="Nhập link airdrop">
@@ -32,7 +28,6 @@
         </div>
     </div>
 
-    <!-- Thư viện Firebase và script -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
@@ -44,10 +39,7 @@
 
         function simpleHash(str) {
             let hash = 0;
-            for (let i = 0; i < str.length; i++) {
-                hash = ((hash << 5) - hash) + str.charCodeAt(i);
-                hash = hash & hash;
-            }
+            for (let i = 0; i < str.length; i++) hash = ((hash << 5) - hash) + str.charCodeAt(i) & hash;
             return hash;
         }
 
@@ -56,62 +48,50 @@
         async function submitLink() {
             const linkName = document.getElementById('linkName').value.trim();
             const link = document.getElementById('linkInput').value.trim();
-
-            if (!link) {
-                alert('Vui lòng nhập link hợp lệ!');
-                return;
-            }
-            if (!linkName) {
-                alert('Vui lòng nhập tên link!');
-                return;
-            }
+            if (!link) return alert('Vui lòng nhập link!');
+            if (!linkName) return alert('Vui lòng nhập tên link!');
 
             const password = prompt("Nhập mã để gửi link:");
-            if (simpleHash(password) !== SECRET_HASH) {
-                alert("Bạn không có quyền gửi link!");
-                return;
-            }
+            if (simpleHash(password) !== SECRET_HASH) return alert('Mã sai, bạn không có quyền gửi link!');
 
             const timestamp = new Date().toLocaleString('vi-VN', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
             try {
                 await addDoc(collection(db, "links"), {
                     name: linkName,
-                    link: link,
-                    timestamp: timestamp,
+                    link,
+                    timestamp,
                     createdAt: new Date().toISOString()
                 });
                 document.getElementById('linkName').value = '';
                 document.getElementById('linkInput').value = '';
                 loadLinks();
             } catch (error) {
-                alert('Lỗi khi gửi link: ' + error.message);
+                alert('Lỗi gửi link: ' + error.message);
             }
         }
 
         async function loadLinks() {
             const linkDisplay = document.getElementById('linkDisplay');
+            linkDisplay.innerHTML = '<div class="loading">Đang tải link...</div>';
             try {
                 const q = query(collection(db, "links"), orderBy("createdAt", "desc"));
                 const querySnapshot = await getDocs(q);
-
                 if (querySnapshot.empty) {
-                    linkDisplay.innerHTML = 'Chưa có link nào được gửi...';
+                    linkDisplay.innerHTML = 'Chưa có link nào.';
                 } else {
                     let linkList = '';
                     querySnapshot.forEach((doc) => {
                         const data = doc.data();
-                        linkList += `
-                            <div class="link-item">
-                                <div class="link-name">${data.name}</div>
-                                <p>Link: <a href="${data.link}" target="_blank">${data.link}</a></p>
-                                <p>Thời gian: ${data.timestamp}</p>
-                            </div>
-                        `;
+                        linkList += `<div class="link-item">
+                            <div class="link-name">${data.name}</div>
+                            <p>Link: <a href="${data.link}" target="_blank">${data.link}</a></p>
+                            <p>Thời gian: ${data.timestamp}</p>
+                        </div>`;
                     });
                     linkDisplay.innerHTML = linkList;
                 }
             } catch (error) {
-                linkDisplay.innerHTML = 'Lỗi tải danh sách link: ' + error.message;
+                linkDisplay.innerHTML = 'Lỗi tải link: ' + error.message;
             }
         }
 
@@ -121,42 +101,38 @@
         });
     </script>
 
-    <!-- Script cho hiệu ứng sao -->
     <script>
         document.addEventListener('mousemove', (e) => {
-            if (Math.random() > 0.7) {
+            if (Math.random() > 0.9) {
                 const star = document.createElement('div');
                 star.className = 'star-particle';
                 star.style.left = `${e.clientX}px`;
                 star.style.top = `${e.clientY}px`;
-
-                const size = Math.random() * 4 + 2;
-                const duration = Math.random() * 1 + 0.5;
+                const size = Math.random() * 3 + 1;
                 star.style.width = `${size}px`;
                 star.style.height = `${size}px`;
-                star.style.animation = `moveStar ${duration}s ease-out forwards`;
-
+                star.style.animation = `moveStar 0.8s ease-out forwards`;
                 document.body.appendChild(star);
-                setTimeout(() => star.remove(), duration * 1000);
+                setTimeout(() => star.remove(), 800);
             }
         });
 
         function createFallingStar() {
-            const star = document.createElement('div');
-            star.className = 'falling-star';
-            star.style.left = `${Math.random() * 100}vw`;
-            star.style.top = `-${Math.random() * 20}px`;
-            const size = Math.random() * 3 + 1;
-            star.style.width = `${size}px`;
-            star.style.height = `${size}px`;
-            const duration = Math.random() * 5 + 3;
-            star.style.animation = `fall ${duration}s linear forwards`;
-
-            document.body.appendChild(star);
-            setTimeout(() => star.remove(), duration * 1000);
+            if (Math.random() > 0.5) {
+                const star = document.createElement('div');
+                star.className = 'falling-star';
+                star.style.left = `${Math.random() * 100}vw`;
+                star.style.top = `-${Math.random() * 10}px`;
+                const size = Math.random() * 2 + 1;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.animation = `fall 3s linear forwards`;
+                document.body.appendChild(star);
+                setTimeout(() => star.remove(), 3000);
+            }
         }
 
-        setInterval(createFallingStar, 300);
+        setInterval(createFallingStar, 500);
     </script>
 </body>
 </html>

@@ -6,9 +6,9 @@
     <title>GJHOME</title>
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/x-icon" href="./img/gj.jfif">
+    <link rel="preload" href="./img/qrdonate.jpg" as="image">
 </head>
 <body>
-    <!-- Menu điều hướng -->
     <nav class="nav-menu">
         <a href="gjhome.html" class="nav-btn active">Home</a>
         <a href="link-claim-airdrop.html" class="nav-btn">Link Claim Airdrop</a>
@@ -17,79 +17,69 @@
 
     <div class="container">
         <h1>GJHOME</h1>
-        <p class="intro-text">Chào mừng bạn đến với GJTOOL - Công cụ hỗ trợ tối ưu cho cộng đồng crypto!</p>
+        <p class="intro-text">Chào mừng bạn đến với GJTOOL - Công cụ tối ưu cho cộng đồng crypto!</p>
 
-        <!-- Phần giới thiệu dự án -->
         <div class="section">
             <h2>Giới thiệu</h2>
-            <p>GJTOOL là một dự án được phát triển để hỗ trợ người dùng trong việc tạo ví Ethereum tùy chỉnh, quản lý danh sách link airdrop, và hơn thế nữa. Với giao diện thân thiện và tính năng mạnh mẽ, chúng tôi mong muốn mang đến trải nghiệm tốt nhất cho cộng đồng yêu thích blockchain.</p>
+            <p>GJTOOL hỗ trợ tạo ví Ethereum tùy chỉnh, quản lý link airdrop và nhiều tính năng khác. Giao diện thân thiện, tính năng mạnh mẽ, mang đến trải nghiệm tốt nhất cho người yêu blockchain.</p>
         </div>
 
-        <!-- Phần Donate và Liên kết xã hội -->
         <div class="donate-section">
             <h3>Support Us</h3>
-            <p>Donate cho mình để mình nâng cấp máy chủ và phát triển thêm tính năng nhé!</p>
-            <img src="./img/qrdonate.jpg" alt="Donate QR Code">
+            <p>Donate để nâng cấp máy chủ và phát triển thêm tính năng!</p>
+            <img src="./img/qrdonate.jpg" alt="Donate QR Code" loading="lazy">
             <div class="social-links">
                 <h4>Follow Us</h4>
                 <div>
                     <a href="https://github.com/tdat05gj" target="_blank" class="social-btn github">
-                        <img src="https://cdn-icons-png.flaticon.com/512/25/25231.png" alt="GitHub">
-                        GitHub
+                        <img src="https://cdn-icons-png.flaticon.com/512/25/25231.png" alt="GitHub" loading="lazy"> GitHub
                     </a>
                     <a href="https://discord.gg/UJmwvgvA2e" target="_blank" class="social-btn discord">
-                        <img src="https://cdn-icons-png.flaticon.com/512/2111/2111370.png" alt="Discord">
-                        Discord
+                        <img src="https://cdn-icons-png.flaticon.com/512/2111/2111370.png" alt="Discord" loading="lazy"> Discord
                     </a>
                     <a href="https://x.com/tdat_gj" target="_blank" class="social-btn x">
-                        <img src="https://cdn-icons-png.flaticon.com/512/733/733635.png" alt="X">
-                        X
+                        <img src="https://cdn-icons-png.flaticon.com/512/733/733635.png" alt="X" loading="lazy"> X
                     </a>
                     <a href="https://t.me/td_gj" target="_blank" class="social-btn telegram">
-                        <img src="https://cdn-icons-png.flaticon.com/512/2111/2111646.png" alt="Telegram">
-                        Telegram
+                        <img src="https://cdn-icons-png.flaticon.com/512/2111/2111646.png" alt="Telegram" loading="lazy"> Telegram
                     </a>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Script cho hiệu ứng sao -->
     <script>
         document.addEventListener('mousemove', (e) => {
-            if (Math.random() > 0.7) {
+            if (Math.random() > 0.9) {
                 const star = document.createElement('div');
                 star.className = 'star-particle';
                 star.style.left = `${e.clientX}px`;
                 star.style.top = `${e.clientY}px`;
-
-                const size = Math.random() * 4 + 2;
-                const duration = Math.random() * 1 + 0.5;
+                const size = Math.random() * 3 + 1;
                 star.style.width = `${size}px`;
                 star.style.height = `${size}px`;
-                star.style.animation = `moveStar ${duration}s ease-out forwards`;
-
+                star.style.animation = `moveStar 0.8s ease-out forwards`;
                 document.body.appendChild(star);
-                setTimeout(() => star.remove(), duration * 1000);
+                setTimeout(() => star.remove(), 800);
             }
         });
 
         function createFallingStar() {
-            const star = document.createElement('div');
-            star.className = 'falling-star';
-            star.style.left = `${Math.random() * 100}vw`;
-            star.style.top = `-${Math.random() * 20}px`;
-            const size = Math.random() * 3 + 1;
-            star.style.width = `${size}px`;
-            star.style.height = `${size}px`;
-            const duration = Math.random() * 5 + 3;
-            star.style.animation = `fall ${duration}s linear forwards`;
-
-            document.body.appendChild(star);
-            setTimeout(() => star.remove(), duration * 1000);
+            if (Math.random() > 0.5) {
+                const star = document.createElement('div');
+                star.className = 'falling-star';
+                star.style.left = `${Math.random() * 100}vw`;
+                star.style.top = `-${Math.random() * 10}px`;
+                const size = Math.random() * 2 + 1;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.animation = `fall 3s linear forwards`;
+                document.body.appendChild(star);
+                setTimeout(() => star.remove(), 3000);
+            }
         }
 
-        setInterval(createFallingStar, 300);
+        setInterval(createFallingStar, 500);
     </script>
 </body>
 </html>
