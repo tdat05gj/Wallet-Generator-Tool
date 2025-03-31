@@ -6,7 +6,6 @@
     <title>GJTOOL - Airdrop</title>
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/x-icon" href="./img/gj.jfif">
-    <link rel="preload" href="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js" as="script">
 </head>
 <body>
     <nav class="nav-menu">
@@ -32,27 +31,40 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
+        // Cấu hình Firebase
         const encodedFirebaseConfig = "eyJhcGlLZXkiOiJBSXphU3lCYTQxY01nTXQtaDA3Vm9HY2hudW42VzVVY204Q2ZLY28iLCJhdXRoRG9tYWluIjoiZ2phaXItNWE2ZWYuZmlyZWJhc2VhcHAuY29tIiwicHJvamVjdElkIjoiZ2phaXItNWE2ZWYiLCJzdG9yYWdlQnVja2V0IjoiZ2phaXItNWE2ZWYuZmlyZWJhc2VzdG9yYWdlLmFwcCIsIm1lc3NhZ2luZ1NlbmRlcklkIjoiOTA1NjEyMzM0MDYwIiwiYXBwSWQiOiIxOjkwNTYxMjMzNDA2MDp3ZWI6N2FiMDA2MDkxZTY2NDU2ODYyZTZjOSIsIm1lYXN1cmVtZW50SWQiOiJHLVhXQkU4VzJNRVYifQ==";
         const firebaseConfig = JSON.parse(atob(encodedFirebaseConfig));
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        // Hàm hash
         function simpleHash(str) {
             let hash = 0;
-            for (let i = 0; i < str.length; i++) hash = ((hash << 5) - hash) + str.charCodeAt(i) & hash;
+            for (let i = 0; i < str.length; i++) {
+                hash = ((hash << 5) - hash) + str.charCodeAt(i);
+            }
             return hash;
         }
 
-        const SECRET_HASH = 99526;
+        const SECRET_HASH = 3130999719; 
 
+        // Gửi link
         async function submitLink() {
             const linkName = document.getElementById('linkName').value.trim();
             const link = document.getElementById('linkInput').value.trim();
+            console.log('Input:', { linkName, link });
+
             if (!link) return alert('Vui lòng nhập link!');
             if (!linkName) return alert('Vui lòng nhập tên link!');
 
             const password = prompt("Nhập mã để gửi link:");
-            if (simpleHash(password) !== SECRET_HASH) return alert('Mã sai, bạn không có quyền gửi link!');
+            const hashedPassword = simpleHash(password);
+            console.log('Entered password:', password, 'Hash:', hashedPassword);
+
+            if (hashedPassword !== SECRET_HASH) {
+                console.log('Hash không khớp:', hashedPassword, '!=', SECRET_HASH);
+                return alert('Mã sai, bạn không có quyền gửi link!');
+            }
 
             const timestamp = new Date().toLocaleString('vi-VN', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
             try {
@@ -62,20 +74,25 @@
                     timestamp,
                     createdAt: new Date().toISOString()
                 });
+                console.log('Gửi link thành công');
                 document.getElementById('linkName').value = '';
                 document.getElementById('linkInput').value = '';
                 loadLinks();
             } catch (error) {
+                console.error('Lỗi gửi link:', error);
                 alert('Lỗi gửi link: ' + error.message);
             }
         }
 
+        // Tải danh sách link
         async function loadLinks() {
             const linkDisplay = document.getElementById('linkDisplay');
             linkDisplay.innerHTML = '<div class="loading">Đang tải link...</div>';
             try {
                 const q = query(collection(db, "links"), orderBy("createdAt", "desc"));
                 const querySnapshot = await getDocs(q);
+                console.log('Số link tải được:', querySnapshot.size);
+
                 if (querySnapshot.empty) {
                     linkDisplay.innerHTML = 'Chưa có link nào.';
                 } else {
@@ -91,12 +108,20 @@
                     linkDisplay.innerHTML = linkList;
                 }
             } catch (error) {
+                console.error('Lỗi tải link:', error);
                 linkDisplay.innerHTML = 'Lỗi tải link: ' + error.message;
             }
         }
 
+        // Gắn sự kiện
         document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('submitLinkBtn').addEventListener('click', submitLink);
+            const submitBtn = document.getElementById('submitLinkBtn');
+            if (submitBtn) {
+                submitBtn.addEventListener('click', submitLink);
+                console.log('Sự kiện click đã được gắn');
+            } else {
+                console.error('Không tìm thấy nút submitLinkBtn');
+            }
             loadLinks();
         });
     </script>
