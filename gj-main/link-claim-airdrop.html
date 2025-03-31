@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GJTOOL - Airdrop</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/x-icon" href="./img/gj.jfif">
+</head>
+<body>
+    <nav class="nav-menu">
+        <a href="index.html" class="nav-btn">Home</a>
+        <a href="link-claim-airdrop.html" class="nav-btn active">Airdrop</a>
+        <a href="gjtool.html" class="nav-btn">Wallet Tools</a>
+    </nav>
+
+    <div class="container">
+        <h1>GJTOOL - Airdrop</h1>
+        <div class="section">
+            <h2>Link Claim Airdrop</h2>
+            <div id="linkDisplay">Chưa có link nào được gửi...</div>
+            <div class="submit-section">
+                <input type="text" id="linkName" placeholder="Tên">
+                <input type="text" id="linkInput" placeholder="Nhập link airdrop">
+                <button class="btn submit-link-btn" id="submitLinkBtn">Gửi Link</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+      
+        const encodedFirebaseConfig = "eyJhcGlLZXkiOiJBSXphU3lCYTQxY01nTXQtaDA3Vm9HY2hudW42VzVVY204Q2ZLY28iLCJhdXRoRG9tYWluIjoiZ2phaXItNWE2ZWYuZmlyZWJhc2VhcHAuY29tIiwicHJvamVjdElkIjoiZ2phaXItNWE2ZWYiLCJzdG9yYWdlQnVja2V0IjoiZ2phaXItNWE2ZWYuZmlyZWJhc2VzdG9yYWdlLmFwcCIsIm1lc3NhZ2luZ1NlbmRlcklkIjoiOTA1NjEyMzM0MDYwIiwiYXBwSWQiOiIxOjkwNTYxMjMzNDA2MDp3ZWI6N2FiMDA2MDkxZTY2NDU2ODYyZTZjOSIsIm1lYXN1cmVtZW50SWQiOiJHLVhXQkU4VzJNRVYifQ==";
+        const firebaseConfig = JSON.parse(atob(encodedFirebaseConfig));
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+      
+        function simpleHash(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                hash = ((hash << 5) - hash) + str.charCodeAt(i);
+            }
+            return hash;
+        }
+
+        const SECRET_HASH = 3130999719; 
+
+     
+        async function submitLink() {
+            const linkName = document.getElementById('linkName').value.trim();
+            const link = document.getElementById('linkInput').value.trim();
+            console.log('Input:', { linkName, link });
+
+            if (!link) return alert('Vui lòng nhập link!');
+            if (!linkName) return alert('Vui lòng nhập tên link!');
+
+            const password = prompt("Nhập mã để gửi link:");
+            const hashedPassword = simpleHash(password);
+            console.log('Entered password:', password, 'Hash:', hashedPassword);
+
+            if (hashedPassword !== SECRET_HASH) {
+                console.log('Hash không khớp:', hashedPassword, '!=', SECRET_HASH);
+                return alert('Bạn không có quyền gửi link!');
+            }
+
+            const timestamp = new Date().toLocaleString('vi-VN', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+            try {
+                await addDoc(collection(db, "links"), {
+                    name: linkName,
+                    link,
+                    timestamp,
+                    createdAt: new Date().toISOString()
+                });
+                console.log('Gửi link thành công');
+                document.getElementById('linkName').value = '';
+                document.getElementById('linkInput').value = '';
+                loadLinks();
+            } catch (error) {
+                console.error('Lỗi gửi link:', error);
+                alert('Lỗi gửi link: ' + error.message);
+            }
+        }
+
+        
+        async function loadLinks() {
+            const linkDisplay = document.getElementById('linkDisplay');
+            linkDisplay.innerHTML = '<div class="loading">Đang tải link...</div>';
+            try {
+                const q = query(collection(db, "links"), orderBy("createdAt", "desc"));
+                const querySnapshot = await getDocs(q);
+                console.log('Số link tải được:', querySnapshot.size);
+
+                if (querySnapshot.empty) {
+                    linkDisplay.innerHTML = 'Chưa có link nào.';
+                } else {
+                    let linkList = '';
+                    querySnapshot.forEach((doc) => {
+                        const data = doc.data();
+                        linkList += `<div class="link-item">
+                            <div class="link-name">${data.name}</div>
+                            <p>Link: <a href="${data.link}" target="_blank">${data.link}</a></p>
+                            <p>Thời gian: ${data.timestamp}</p>
+                        </div>`;
+                    });
+                    linkDisplay.innerHTML = linkList;
+                }
+            } catch (error) {
+                console.error('Lỗi tải link:', error);
+                linkDisplay.innerHTML = 'Lỗi tải link: ' + error.message;
+            }
+        }
+
+       
+        document.addEventListener('DOMContentLoaded', () => {
+            const submitBtn = document.getElementById('submitLinkBtn');
+            if (submitBtn) {
+                submitBtn.addEventListener('click', submitLink);
+                console.log('Sự kiện click đã được gắn');
+            } else {
+                console.error('Không tìm thấy nút submitLinkBtn');
+            }
+            loadLinks();
+        });
+    </script>
+
+    <script>
+        document.addEventListener('mousemove', (e) => {
+            if (Math.random() > 0.9) {
+                const star = document.createElement('div');
+                star.className = 'star-particle';
+                star.style.left = `${e.clientX}px`;
+                star.style.top = `${e.clientY}px`;
+                const size = Math.random() * 3 + 1;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.animation = `moveStar 0.8s ease-out forwards`;
+                document.body.appendChild(star);
+                setTimeout(() => star.remove(), 800);
+            }
+        });
+
+        function createFallingStar() {
+            if (Math.random() > 0.5) {
+                const star = document.createElement('div');
+                star.className = 'falling-star';
+                star.style.left = `${Math.random() * 100}vw`;
+                star.style.top = `-${Math.random() * 10}px`;
+                const size = Math.random() * 2 + 1;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.animation = `fall 3s linear forwards`;
+                document.body.appendChild(star);
+                setTimeout(() => star.remove(), 3000);
+            }
+        }
+
+        setInterval(createFallingStar, 500);
+    </script>
+</body>
+</html>
