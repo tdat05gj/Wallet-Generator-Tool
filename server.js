@@ -7,7 +7,7 @@ const port = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.static(__dirname));
 
-
+// Middleware để đảm bảo luôn trả về JSON
 app.use((req, res, next) => {
     res.setHeader('Content-Type', 'application/json');
     next();
@@ -83,7 +83,7 @@ app.post('/generate-multiple', async (req, res) => {
     }
 });
 
-
+// Xử lý lỗi không tìm thấy route
 app.use((req, res) => {
     res.status(404).json({ success: false, error: 'Route not found' });
 });

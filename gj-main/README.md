@@ -1,2 +1,0 @@
-https://gjteam.org
-

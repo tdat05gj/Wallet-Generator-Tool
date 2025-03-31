@@ -31,13 +31,13 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
-      
+        // Cấu hình Firebase
         const encodedFirebaseConfig = "eyJhcGlLZXkiOiJBSXphU3lCYTQxY01nTXQtaDA3Vm9HY2hudW42VzVVY204Q2ZLY28iLCJhdXRoRG9tYWluIjoiZ2phaXItNWE2ZWYuZmlyZWJhc2VhcHAuY29tIiwicHJvamVjdElkIjoiZ2phaXItNWE2ZWYiLCJzdG9yYWdlQnVja2V0IjoiZ2phaXItNWE2ZWYuZmlyZWJhc2VzdG9yYWdlLmFwcCIsIm1lc3NhZ2luZ1NlbmRlcklkIjoiOTA1NjEyMzM0MDYwIiwiYXBwSWQiOiIxOjkwNTYxMjMzNDA2MDp3ZWI6N2FiMDA2MDkxZTY2NDU2ODYyZTZjOSIsIm1lYXN1cmVtZW50SWQiOiJHLVhXQkU4VzJNRVYifQ==";
         const firebaseConfig = JSON.parse(atob(encodedFirebaseConfig));
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-      
+        // Hàm hash
         function simpleHash(str) {
             let hash = 0;
             for (let i = 0; i < str.length; i++) {
@@ -48,7 +48,7 @@
 
         const SECRET_HASH = 3130999719; 
 
-     
+        // Gửi link
         async function submitLink() {
             const linkName = document.getElementById('linkName').value.trim();
             const link = document.getElementById('linkInput').value.trim();
@@ -63,7 +63,7 @@
 
             if (hashedPassword !== SECRET_HASH) {
                 console.log('Hash không khớp:', hashedPassword, '!=', SECRET_HASH);
-                return alert('Bạn không có quyền gửi link!');
+                return alert('Mã sai, bạn không có quyền gửi link!');
             }
 
             const timestamp = new Date().toLocaleString('vi-VN', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
@@ -84,7 +84,7 @@
             }
         }
 
-        
+        // Tải danh sách link
         async function loadLinks() {
             const linkDisplay = document.getElementById('linkDisplay');
             linkDisplay.innerHTML = '<div class="loading">Đang tải link...</div>';
@@ -113,7 +113,7 @@
             }
         }
 
-       
+        // Gắn sự kiện
         document.addEventListener('DOMContentLoaded', () => {
             const submitBtn = document.getElementById('submitLinkBtn');
             if (submitBtn) {

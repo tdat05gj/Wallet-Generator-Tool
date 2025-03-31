@@ -179,7 +179,7 @@
 
     <script>
         document.addEventListener('mousemove', (e) => {
-            if (Math.random() > 0.9) { 
+            if (Math.random() > 0.9) { // Giảm tần suất sao
                 const star = document.createElement('div');
                 star.className = 'star-particle';
                 star.style.left = `${e.clientX}px`;
@@ -194,7 +194,7 @@
         });
 
         function createFallingStar() {
-            if (Math.random() > 0.5) { 
+            if (Math.random() > 0.5) { // Giảm tần suất sao rơi
                 const star = document.createElement('div');
                 star.className = 'falling-star';
                 star.style.left = `${Math.random() * 100}vw`;
@@ -208,7 +208,7 @@
             }
         }
 
-        setInterval(createFallingStar, 500);
+        setInterval(createFallingStar, 500); // Giảm tần suất
     </script>
 </body>
 </html>
