@@ -1,4 +1,10 @@
 {
+  "name": "gjchain",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
   "dependencies": {
     "ethers": "^6.13.5",
     "express": "^4.21.2"
